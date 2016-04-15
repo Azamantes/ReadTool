@@ -5,7 +5,7 @@
 
 Version is going to shift from (0.1 -> 1.0), (0.2 -> 2.0) and so on whenever I feel the time has come.
 
-<h1>Current version: 0.0.11<b></b></h1>
+<h1>Current version: 0.0.12<b></b></h1>
 
 <b>Incoming improvements:</b>
 <ul>

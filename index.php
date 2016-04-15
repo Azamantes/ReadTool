@@ -16,7 +16,6 @@
 	<link rel='stylesheet' href='css/classes.css' type='text/css'>
 	<link rel='stylesheet' href='css/forms.css' type='text/css'>
 	<link rel='stylesheet' href='css/main.css' type='text/css'>
-	<!-- <link rel='stylesheet' href='css/ported.css' type='text/css'> -->
 	
 	<?php
 		if(isset($_SESSION['user'])){
@@ -24,7 +23,7 @@
 		}
 	?>
 
-	<script src='/Libraries/jscolor/jscolor.js'></script>
+	<!-- <script src='/Libraries/jscolor/jscolor.js'></script> -->
 	<script src='/Libraries/Mithril/mithril.min.js'></script>
 	<script src='js/extensions.js'></script>
 	<script src='js/classes.js'></script>
@@ -41,30 +40,6 @@
 	<script src='js/sky_logout.js'></script>
 	<script src='js/sky_text_browser.js'></script>
 	<script src='js/sky_text_add.js'></script>
-
-<style>
-/*	.cssload-container {
-		width: 100%;
-		height: 47px;
-		text-align: center;
-	}
-
-	.cssload-speeding-wheel {
-		width: 47px;
-		height: 47px;
-		margin: 0 auto;
-		border: 3px solid rgb(0,0,0);
-		border-radius: 50%;
-		border-left-color: transparent;
-		border-right-color: transparent;
-		animation: cssload-spin 475ms infinite linear;
-	}
-
-	@keyframes cssload-spin {
-		100%{ transform: rotate(360deg); transform: rotate(360deg); }
-	}*/
-</style>
-
 </head>
 <body>
 	<div id='topbar-container' class='field'>
@@ -162,23 +137,7 @@
 	</div>
 	<div id='sky-container'  class='hidden'>
 		<div id='fog'></div>
-		<div id='sky' class='.relative'>
-			<div>
-				<b>Keyboard navigation:</b><br><br>
-				1 - browse texts to read<br>
-				2 - add new texts<br>
-				3 - browse unchecked (yet) texts (Language Supervisors only)<br>
-				4 - correct and approve unchecked texts (Language Supervisors only)<br>
-				R - reload text<br>
-				Esc - hide all layers
-				<hr>
-				<b>When reading a text:</b><br><br>
-				Add word translation - E + click on a word<br>
-				Add phrase translation - select text + S<br>
-				Get phrase translation - select text + F<br>
-				Get word translation - click on a word <br>
-			</div>
-		</div>
+		<div id='sky' class='.relative'></div>
 	</div>
 </body>
 

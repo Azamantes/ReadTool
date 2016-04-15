@@ -25,10 +25,7 @@ I am <b>not</b> going to support Internet Explorer.
 I might support touchscreen devices, but only when the PC version is done.
 
 <p><b>Goal:</b></p>
-Create a lightning fast, easy-to-use tool, with very <b>minimalistic design</b> that will facilitate reading a text in a foreign language. It probably won't depend on any external dictionaries on its own, all input will be done manually by the user(s). A translator widget or some sort is possible (in the future).
+Create a lightning fast, easy-to-use tool, with very <b>minimalistic design</b> that will facilitate reading a text in a foreign language.
 ReadTool is keeping its own translation data in the database so even without internet connection you can still review your previously read texts.
-
-When the basic features are implemented I will get to other stuff like creating your own lessons, competitions with other users and more. I even plan on doing tutor/teacher based lessons 1 teacher - many students around a selected text. For now it's just an idea, no details.
-
 
 Feel free to e-mail me and share your thoughts. My mail: azamantes@protonmail.com

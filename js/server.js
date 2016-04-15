@@ -109,6 +109,7 @@ User.prototype.connect = function(data){
 			this.getMyWords(language);
 		});
 		this.unicast({ event: 'languages', data: Global.get('languages') });
+		this.unicast({ event: 'RegExp', data: this.REGEXP_STRING });
 		Global.get('languages').map(box => {
 			if(box.id === this.languageFrom){
 				this.unicast({ event: 'Language From', data: box.shorthand });
@@ -136,7 +137,7 @@ User.prototype.disconnect = function(){ //logout
 	this.socket.close();
 };
 User.prototype.unicast = function(data){
-	console.log('Wysylam unicasta');
+	// console.log('Wysylam unicasta');
 	this.socket.send(JSON.stringify(data));
 }
 
@@ -191,37 +192,46 @@ User.prototype.submitText = function(data){
 	// var content_nodoubles = data.content.replace(/\.+/g, '.');
 	// var sentences = content_nodoubles.split(/[\.]/).map(x => x.trim() + '.');
 	// var content = data.content.replace(/\n/g, ' |br| ')split(' ')this.cleanText(data.content).toLowerCase()
-	var content = this.cleanText(data.content).toLowerCase();
-	var string = content.trim();
-	var words = new Set(string.split(/ /g));
-	words.delete('');
+	var content = this.cleanText(data.content).toLowerCase().split(' ');
+
+	let i = -1;
+	let length = content.length;
+	let set = new Set;
+	let word;
+	var content_clean = '';
+	while(++i < length){
+		word = content[i];
+		if(!set.has(word)){
+			set.add(word);
+			content_clean += word + ' ';
+			console.log('Nowy wyraz:', word);
+		}
+	}
+	console.log('Dlugosc content_clean:', content_clean.length);
+	content_clean = content_clean.trim();
+	console.log('To sa wyrazy unikalne:', content_clean);
+
+	var words = new Set(content_clean.split(/ /g));
 
 	data.language = parseInt(data.language);
-	data.words = string.split(/ /g).length;
+	data.words = content_clean.split(/ /g).length;
 	data.words_unique = words.size;
-	data.length = this.cleanText(string).length;
+	data.length = this.cleanText(content_clean).length;
 	data.author = this.userID;
 	data.source = data.source || '';
-	// console.log('Title:', data.title);
-	// console.log('Content:', data.content);
-	// console.log('Language:', parseInt(data.language));
-	// console.log('Words:', string.split(/ /g).length);
-	// console.log('Words unique:', words.size);
-	// console.log('Length:', data.length);
-	database.query(SQL_QUERIES.submitText.dirty, [data.title, data.content, data.language, data.words, data.words_unique, data.length, data.author, data.source])
+
+	database.query(SQL_QUERIES.submitText.dirty, [ data.title, data.content, data.language, data.words, data.words_unique, data.length, data.author, data.source ])
 	.on('error', (error) => {
 		console.log(error.message);
 		this.unicast({ event: 'Text Submit Failed' });
 	}).on('result', (row) => {
 		data.insertedID = row.insertId;
 		var language = data.language;
-		Array.from(new Set(content.split(' ')).values()).map(clean => {
-			database.query(SQL_QUERIES.insertWord, [ clean, language ])
-			.on('error', (error) => {
-				console.log(error.message);
-			});
+		content_clean.split(' ').map(clean => {
+			this.query(SQL_QUERIES.insertWord, [ clean, language ]);
 		});
-		database.query(SQL_QUERIES.submitText.clean, [ row.insertId, content ])
+		console.log('Dlugosc content_clean:', content_clean.length);
+		this.query(SQL_QUERIES.submitText.clean, [ row.insertId, content_clean ])
 		.on('end', () => {
 			this.unicast({
 				event: 'Text Submit Success',
@@ -372,12 +382,15 @@ User.prototype.changePassword = function(data){ // na razie nie ma w ogole uzytk
 /*
  * SOME UTILS
 */
+User.prototype.REGEXP = /[0-9\/»«\:;'"„“”\[\]\{\}~<>\|\!@#\$%\^&\*\)\(\+\=\.,_—–\-\?×ˈ\/]/g;
+User.prototype.REGEXP_STRING = "[0-9\\/»«\\:;'\"„“”\\]\\[\\{\\}~<>\\|\\!@#\\$%\\^&\\*\\(\\)\\+\\=\\.,_—–\\-\\?×ˈ\\/]";
 User.prototype.toUpperCase = function(string){
 	return string[0].toUpperCase() + string.slice(1);
 };
 User.prototype.cleanText = function(string){
 	return (string || '').replace(/\.([^0-9])/g, '. $1')
-		.replace(/[0-9\/»«\:;'"„“”\[\]\{\}~<>\|\!@#\$%\^&\*\)\(\+\=\.,_—–\-\?×]/g, '') //bez /
+		.replace(/\s+/g, ' ')
+		.replace(this.REGEXP, '') //bez /
 		.replace(new RegExp(User.prototype.specialStrings, 'g'), '')
 		.replace(/ +/g, ' ')
 		.trim();

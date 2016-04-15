@@ -18,3 +18,7 @@ Watchdog.listen('websocket: languages', function(data){
 	document.get('language_from').appendChild(fragment.cloneNode(true));
 	document.get('language_to').appendChild(fragment.cloneNode(true));
 });
+
+var abc = function*(i){
+	while(--i) yield i;
+}
