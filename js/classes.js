@@ -29,7 +29,8 @@ CSSClass.prototype.set = function(stylesheet, config){
 	Object.keys(config).map(key => {
 		string += key + ' {\n';
 		config[key].toArray().map(style => {
-			string += '\t' + style[0] + ': ' + style[1] + ';\n'
+			// console.log(style, config[key][style]);
+			string += '\t' + style + ': ' + config[key][style] + ';\n'
 		});
 		string += '}\n';
 	});

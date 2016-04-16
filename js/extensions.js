@@ -24,7 +24,7 @@ Object.prototype.define = function(property, config){
 	Object.defineProperty(this, property, config);
 };
 Object.prototype.toArray = function(){
-	return Object.entries(this);
+	return Object.keys(this);
 };
 console.log('Object.prototype.define -> same as Object.defineProperty');
 console.log('Object.prototype.toArray -> returns array of pais [key, value]');

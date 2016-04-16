@@ -9,13 +9,14 @@
 	self.listen('css', changeCSS);
 
 	function init(){
+		console.log('bedzie ustawione...');
 		CSS.set('reading', {
 			y: {
-				background: 'cornflowerblue',
+				'background': 'cornflowerblue',
 				'border-radius': '5px'
 			},
 			'y:hover': {
-				background: 'lightgreen'
+				'background': 'lightgreen'
 			}
 		});
 	}
