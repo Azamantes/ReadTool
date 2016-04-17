@@ -7,12 +7,7 @@ Version is going to shift from (0.1 -> 1.0), (0.2 -> 2.0) and so on whenever I f
 
 <h1>Current version: 0.0.12<b></b></h1>
 
-<b>Incoming improvements:</b>
-<ul>
-  <li>Variable checking on the server-side</li>
-</ul>
-
-<b>Milestone reached. Current version (0.0.12) is fully developed. Features still may be improved. Soon shift to 0.1.0.</b>
+<b>Milestone almost reached (1 feature left). Soon shift to 0.1.0.</b>
 
 <b>Version:</b> 0.0.12
 <ul>
