@@ -1,13 +1,11 @@
-// m.render(DOM('browser'), View.Browser());
-
-(function(){
+(function SKY_BROWSE_TEXTS(){
 	'use strict';
 
 	var place;
 	var state = new Map;
 	state.set('boolean', false);
 
-	var self = new NinjaModule(true);
+	var self = new NinjaModule(true); //true -> self.addRoute on init
 	self.listen('keydown: 49', show);
 	self.listen('websocket: titles', putContent);
 	self.component.view = view;
@@ -48,10 +46,13 @@
 	}
 	function getTexts(event){
 		event.preventDefault();
+
 		var what = document.get('browser_sort_what');
-		what = what.options[what.selectedIndex].text;
 		var how = document.get('browser_sort_how');
+
+		what = what.options[what.selectedIndex].text;
 		how = how.options[how.selectedIndex].text;
+		
 		websocket.sendJSON({
 			event: 'getTitles',
 			what: what,
@@ -68,15 +69,13 @@
 		}
 		id = parseInt(id.replace('title#', ''));
 		if(id === NaN || id <= 0){
-			return; //really?
+			return; // really?
 		}
 		console.log('Wybrano tytul:', id);
-		// document.get('main').innerHTML = '';
 		websocket.sendJSON({
 			event: 'pullText',
 			id: id
 		});
-
 	}
 	function putContent(data){
 		data = data.data;

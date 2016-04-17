@@ -58,10 +58,9 @@
 				<span></span>
 				<div id='language_from' class='dropdown' event='Language From'></div>
 			</div>
-			
 		</div>
 	</div>
-	<div id='main-translation'></div>
+	<div id='main-translation'>asd</div>
 	<div id='main-container' class='field'>
 		
 		<div id='main' class='relative'>

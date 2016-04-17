@@ -1,4 +1,4 @@
-(function(){
+(function TEXT(){
 	'use strict';
 	
 	var Words = new Map;
@@ -39,12 +39,15 @@
 		REGEXP = new RegExp(data.data, 'g');
 	}
 	function parseText(data){
-		Text.set('language', data.language);
-		var LANGUAGE_WORDS = Words.get(data.language);
-		let array = data.content.replace(/\n/g, ' <br> ').replace(/ +/g, ' ').split(' ');
-		let length = array.length,
+		var LANGUAGE_WORDS = Words.get(data.language),
+			array = data.content.replace(/\n/g, ' <br> ').replace(/ +/g, ' ').split(' '),
+			length = array.length,
 			i = -1,
 			word, tag, box;
+
+		Text.set('language', data.language);
+		Text.set('title', data.title);
+		Text.set('source', data.source);
 
 		Cache = [];
 		CleanIndexesDOM = new Map;
@@ -63,10 +66,9 @@
 			tag = LANGUAGE_WORDS.has(box)? 'y' : 'x';
 			Cache.push('<' + tag + '>' + word + '</' + tag + '>');
 		}
-		Text.set('title', data.title);
-		Text.set('source', data.source);
+		
 		render();
-		bindDOMReferences(); // I thought it ought to be inside setTimeout...
+		bindDOMReferences();
 		self.deity.closeModule();
 
 		Text.set('number: all', data.words);
@@ -76,8 +78,8 @@
 	function bindDOMReferences(){
 		CleanDOMReferences = new Map;
 		var content = document.get('text_reading_content').children,
-			box = {};
-		let iterator = CleanIndexesDOM.keys(),
+			box = {},
+			iterator = CleanIndexesDOM.keys(),
 			array;
 		while(true){
 			box = iterator.next();
@@ -117,13 +119,17 @@
 			target = event.target,
 			tag = target.tagName.toLowerCase(),
 			text, logic;
+		
 		if(!allowedTags.has(tag)){
 			return;
 		}
+
 		text = target.textContent.toLowerCase().replace(REGEXP, '');
+		
 		if(text === ''){
 			return;
 		}
+
 		logic = tag === 'x';
 		replaceNodes(target, text, logic);
 
@@ -155,7 +161,7 @@
 		self.deity.shout('translation: from', clean); // for translation
 		if(clean === lastWord){
 			lastWord = clean;
-			showTranslation();
+			showTranslation(event);
 		} else {
 			websocket.sendJSON({
 				event: 'getTranslation',
@@ -185,13 +191,13 @@
 	function putTranslation(){
 		FloatingTranslation.innerHTML = currentTranslation.length? '<p>' + currentTranslation.join('</p><p>') + '</p>' : '<p>...</p>';
 	}
-	function showTranslation(x, y){
+	function showTranslation(){
 		self.deity.shout('css', ['main-css', {
 			'#main-translation': {
 				'animation': 'main-translation 1s',
 				'animation-fill-mode': 'forwards',
-				'bottom': ((screen.height - screen.availTop) - Position.y - 35) + 'px',
-				'right': ((screen.width - screen.availLeft) - Position.x - 25) + 'px'
+				'bottom': (screen.height - screen.availTop - Position.y - 40) + 'px',
+				'right': (screen.width - screen.availLeft - Position.x - 40) + 'px'
 			}
 		}]);
 	}

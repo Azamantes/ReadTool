@@ -9,7 +9,6 @@ Version is going to shift from (0.1 -> 1.0), (0.2 -> 2.0) and so on whenever I f
 
 <b>Incoming improvements:</b>
 <ul>
-  <li>Getting rid of superfluous variables and statements/expressions in code</li>
   <li>Variable checking on the server-side</li>
 </ul>
 

@@ -80,10 +80,9 @@
 	margin-right: 5px;
 }
 
-
-/*
- * Text Browser
-*/
+/* --------------
+	Text Browser
+ --------------- */
 #text_browser_topbar {
 	position: absolute;
 	top: 10px;
@@ -125,10 +124,9 @@
 	float: right;
 }
 
-/*
- * Add new text
-*/
-
+/* --------------
+	Add new textr
+ --------------- */
 #text_add_title,
 #text_add_content,
 #text_add_source,
@@ -143,7 +141,6 @@
 	width: 90%;
 	float: right;
 }
-
 #text_add_content > textarea {
 	height: 100%;
 	resize: none;

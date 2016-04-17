@@ -1,12 +1,8 @@
 .form {
 	margin: 10% auto auto;
 	text-align: center;
-	/*background-color: lightgrey;*/
 	padding: 10px;
 }
-/*.form div {
-	margin: 10px 0px;
-}*/
 .form-head, .form-body, .form-bottom, .form-body-left, .form-body-right {
 	margin: 10px 0px;
 }

@@ -1,4 +1,4 @@
-(function(){
+(function SKY_LOGOUT(){
 	'use strict';
 
 	var self = new NinjaModule(true);

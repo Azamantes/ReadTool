@@ -1,27 +1,25 @@
 'use strict';
 
-var WebSocketServer = require('ws').Server;
-var server = new WebSocketServer({
+const Global = new Map;
+const Userlist = new Set;
+const SQL_QUERIES = require('./sql_queries.js');
+
+const WebSocketServer = require('ws').Server;
+const server = new WebSocketServer({
 	port: 8090
 });
-var database = require('mysql').createConnection({
+const database = require('mysql').createConnection({
 	host: '127.0.0.1',
 	user: 'root',
 	password: '',
 	database: 'readtool',
 	multipleStatements: true
 });
-database.connect();
-Object.defineProperty(User.prototype, 'database', {
-	get: () => database
-});
 
-const Global = new Map;
-const Userlist = new Set;
-const SQL_QUERIES = require('./sql_queries.js');
-
-(function(){
+(function GET_LANGUAGES(){
 	var box = [];
+
+	database.connect();
 	database.query("SELECT id, name, shorthand FROM languages ORDER BY id;")
 	.on('result', function(row){
 		box.push({
@@ -59,6 +57,7 @@ function User(socket){
 	this.languageFrom = null;
 	this.languageTo = null;
 }
+User.prototype.database = database;
 User.prototype.events = new Set([
 	'connect',
 	'disconnect',
@@ -72,14 +71,12 @@ User.prototype.events = new Set([
 	'getTranslation'
 ]);
 User.prototype.errorQuery = function(error){
-	console.log(error.message);
+	console.log('Database error (expected) :: [' + error.message + ']');
 };
 User.prototype.query = function(sql, argv){
 	return this.database.query(sql, argv || [])
 	.on('error', this.errorQuery);
 };
-User.prototype.getWords = function(){};
-User.prototype.getMyWords = function(){};
 
 /*
  * CONNECTION
@@ -88,26 +85,24 @@ User.prototype.identity = function(){
 	return '[' + this.userID + ']', this.login;
 };
 User.prototype.connect = function(data){
+	if(!!this.userID){
+		return console.log('Someone tried to impersonate user', this.userID);
+	}
+
 	var userID = data.userID;
+
 	database.query(SQL_QUERIES.connect, [userID])
 	.on('result', (row) => {
-		console.log(row.id, row.login, row.language_from, row.language_to);
-		console.log('jest result connect', row.id, row.login);
 		this.userID = row.id;
 		this.login = row.login;
 		this.languageFrom = row.language_from;
 		this.languageTo = row.language_to;
 		Userlist.add(this);
 	}).on('end', () => {
-		if(this.userID === null){
-			console.log('this.userID:', this.userID);
-			console.log('this.login:', this.login);
+		if(!this.userID){
 			return this.socket.disconnect();
 		}
 		this.unicast({ event: 'connected.' });
-		Array.from(this.languages.keys()).map(language => {
-			this.getMyWords(language);
-		});
 		this.unicast({ event: 'languages', data: Global.get('languages') });
 		this.unicast({ event: 'RegExp', data: this.REGEXP_STRING });
 		Global.get('languages').map(box => {
@@ -118,9 +113,12 @@ User.prototype.connect = function(data){
 				this.unicast({ event: 'Language To', data: box.shorthand });
 			}
 		});
+		Array.from(this.languages.keys()).map(language => this.getMyWords(language));
 	});
 };
 User.prototype.getMyWords = function(language){
+	if(!language) return;
+
 	database.query("SELECT content FROM words w, users_words uw WHERE uw.user = ? AND uw.word = w.id AND w.language = ?;", [ this.userID, language ])
 	.on('result', (row) => {
 		this.languages.get(language).add(row.content);
@@ -132,12 +130,14 @@ User.prototype.getMyWords = function(language){
 		});
 	});
 };
-User.prototype.disconnect = function(){ //logout
+User.prototype.disconnect = function(){
 	Userlist.delete(this);
 	this.socket.close();
 };
 User.prototype.unicast = function(data){
-	// console.log('Wysylam unicasta');
+	if(!data){
+		return console.log('User.prototype.unicast :: no data given.');
+	}
 	this.socket.send(JSON.stringify(data));
 }
 
@@ -145,7 +145,12 @@ User.prototype.unicast = function(data){
  * CHANGE LANGUAGE FROM / TO
 */
 User.prototype.changeLanguageFrom = function(data){
+	if(!data){
+		return console.log('User.prototype.changeLanguageFrom :: no data given.');
+	}
+
 	var language = data.data;
+
 	if(!language || language['constructor'] !== String){
 		return console.log('User ' + this.identity() + 'was trying to set some weird language_from:', language + '.');
 	}
@@ -165,7 +170,12 @@ User.prototype.changeLanguageFrom = function(data){
 	});
 };
 User.prototype.changeLanguageTo = function(data){
+	if(!data){
+		return console.log('User.prototype.changeLanguageTo :: no data given.');
+	}
+
 	var language = data.data;
+
 	if(!language || language['constructor'] !== String){
 		return console.log('User ' + this.identity() + 'was trying to set some weird language_to:', language + '.');
 	}
@@ -189,29 +199,27 @@ User.prototype.changeLanguageTo = function(data){
  * SUBMIT NEW TEXT, PARSE IT
 */
 User.prototype.submitText = function(data){
-	// var content_nodoubles = data.content.replace(/\.+/g, '.');
-	// var sentences = content_nodoubles.split(/[\.]/).map(x => x.trim() + '.');
-	// var content = data.content.replace(/\n/g, ' |br| ')split(' ')this.cleanText(data.content).toLowerCase()
-	var content = this.cleanText(data.content).toLowerCase().split(' ');
+	if(!data){
+		return console.log('User.prototype.submitText :: no data given.');
+	}
 
-	let i = -1;
-	let length = content.length;
-	let set = new Set;
-	let word;
-	var content_clean = '';
+	var content = this.cleanText(data.content).toLowerCase().split(' '),
+		i = -1,
+		length = content.length,
+		set = new Set,
+		word,
+		content_clean = '',
+		words;
+
 	while(++i < length){
 		word = content[i];
 		if(!set.has(word)){
 			set.add(word);
 			content_clean += word + ' ';
-			console.log('Nowy wyraz:', word);
 		}
 	}
-	console.log('Dlugosc content_clean:', content_clean.length);
 	content_clean = content_clean.trim();
-	console.log('To sa wyrazy unikalne:', content_clean);
-
-	var words = new Set(content_clean.split(/ /g));
+	words = new Set(content_clean.split(/ /g));
 
 	data.language = parseInt(data.language);
 	data.words = content_clean.split(/ /g).length;
@@ -230,13 +238,9 @@ User.prototype.submitText = function(data){
 		content_clean.split(' ').map(clean => {
 			this.query(SQL_QUERIES.insertWord, [ clean, language ]);
 		});
-		console.log('Dlugosc content_clean:', content_clean.length);
 		this.query(SQL_QUERIES.submitText.clean, [ row.insertId, content_clean ])
 		.on('end', () => {
-			this.unicast({
-				event: 'Text Submit Success',
-				success: true
-			});
+			this.unicast({ event: 'Text Submit Success', success: true });
 		});
 	});
 };
@@ -245,15 +249,22 @@ User.prototype.submitText = function(data){
  * WORD MANAGEMENT
 */
 User.prototype.wordState = function(data){
+	if(!data){
+		return console.log('User.prototype.wordState :: no data given.');
+	}
+
 	var state = data.state;
 	var word = data.word;
-	console.log('To jest string:', SQL_QUERIES.wordState[state]);
-	this.query(SQL_QUERIES.wordState[state], [this.userID, word, this.languageFrom])
-	.on('end', () => {  });
+	
+	this.query(SQL_QUERIES.wordState[state], [this.userID, word, this.languageFrom]);
 }
 User.prototype.addTranslation = function(data){
+	if(!data){
+		return console.log('User.prototype.addTranslation :: no data given.');
+	}
+
 	var from, to;
-	console.log('jest addTranslation');
+
 	database.query(SQL_QUERIES.wordExists, [ data.from, this.languageFrom ])
 	.on('result', (row) => {
 		if(row.id > 0){
@@ -265,11 +276,10 @@ User.prototype.addTranslation = function(data){
 			console.log('Word "from" does not exist.');
 			return; //word doesn't even exist in the database.
 		}
-		console.log('Bedzie insert:', data.to, this.languageTo);
 		database.query(SQL_QUERIES.insertWord, [ data.to, this.languageTo ])
 		.on('error', (error) => { console.log(error.message) })
 		.on('end', () => {
-			console.log('Moze i byl error ale jedziem dalej! Wiśta wio!!!');
+			console.log('Maybe there was an error but let\'s proceed.');
 			database.query(SQL_QUERIES.wordExists, [ data.to, this.languageTo ])
 			.on('result', (row) => {
 				var to = row.id;
@@ -281,14 +291,12 @@ User.prototype.addTranslation = function(data){
 				.on('error', (error) => { console.log(error.message) })
 				.on('result', (row) => {
 					if(row.affectedRows === 1){
-						// this.getTranslation(data.from);
 						console.log('Add translation: success!');
 						this.unicast({
 							event: 'Translation Added',
 							translation: [ data.to ]
 						});
 					} else {
-						console.log(row);
 						console.log('Could not add translation for some reason.');
 					}
 				});
@@ -297,26 +305,23 @@ User.prototype.addTranslation = function(data){
 	});
 };
 User.prototype.getTranslation = function(data){
-	// console.log('getTransaltion:', this);
+	if(!data){
+		return console.log('User.prototype.getTranslation :: no data given.');
+	}
+
 	var event = !!data.find? 'Translation Found' : 'Translation Got';
 	var limit = !!data.find? '' : 'LIMIT 5';
-	if(this.languageFrom === this.languageTo){
-		this.unicast({
-			event: event,
-			translation: [ data.from ]
-		});
-		return;
-	}
 	var box = [];
-	console.log(this.replace(SQL_QUERIES.getTranslation, { limit }));
+
+	if(this.languageFrom === this.languageTo){
+		return this.unicast({ event: event, translation: [ data.from ] });
+	}
+
 	this.query(this.replace(SQL_QUERIES.getTranslation, { limit }), [ data.from, this.languageFrom, this.languageTo ])
 	.on('result', (row) => {
 		box.push(row.content);
 	}).on('end', () => {
-		this.unicast({
-			event: event,
-			translation: box
-		});
+		this.unicast({ event: event, translation: box });
 	});
 };
 
@@ -324,14 +329,17 @@ User.prototype.getTranslation = function(data){
  * RETRIEVE TEXT + CLEAN CONTENT
 */
 User.prototype.getTitles = function(data){
+	if(!data){
+		return console.log('User.prototype.getTitles :: no data given.');
+	}
+
 	var what = data.what;
 	var how = data.how;
 	var contains;
-	if(data.contains['constructor'] === String){
-		contains = data.contains;
-	} else contains = '';
 	var box = [];
-	console.log(this.replace(SQL_QUERIES.getTitles, { contains, how, what }));
+	
+	contains = data.contains['constructor'] === String? data.contains : '';
+
 	database.query(this.replace(SQL_QUERIES.getTitles, { contains, how, what }), [this.languageFrom])
 	.on('result', (row) => {
 		box.push({
@@ -344,18 +352,18 @@ User.prototype.getTitles = function(data){
 			author: row.author
 		});
 	}).on('end', () => {
-		console.log('bedzie unicast:', box);
-		this.unicast({
-			event: 'titles',
-			data: box
-		});
+		this.unicast({ event: 'titles', data: box });
 	});
 };
 User.prototype.pullText = function(data){
+	if(!data){
+		return console.log('User.prototype.pullText :: no data given.');
+	}
+
 	var id = data.id;
+
 	database.query(SQL_QUERIES.pullText, [ id ])
 	.on('result', (row) => {
-		console.log('jest pulledText');
 		this.unicast({
 			event: 'pulledText',
 			title: row.title,
@@ -372,32 +380,40 @@ User.prototype.pullText = function(data){
 /*
  * PASSWORD
 */
-User.prototype.changePassword = function(data){ // na razie nie ma w ogole uzytkownikow ani kont wiec nieistotne
+User.prototype.changePassword = function(data){
+	if(!data){
+		return console.log('User.prototype.changePassword :: no data given.');
+	}
 	database.query(SQL_QUERIES.changePassword, [data.password, this.userID])
 	.on('end', () => {
-		console.log(this.login, 'zmienil(a) haslo.');
+		console.log(this.login, 'changed password.');
 	});
 };
 
 /*
  * SOME UTILS
 */
-User.prototype.REGEXP = /[0-9\/»«\:;'"„“”\[\]\{\}~<>\|\!@#\$%\^&\*\)\(\+\=\.,_—–\-\?×ˈ\/]/g;
+User.prototype.REGEXP = /[0-9\/»«\:;'"„“”\[\]\{\}~<>\|\!@#\$%\^&\*\)\(\+\=\.,_—–\-\?×ˈ\/]/g; // JSON.stringify() makes this an empty object, hence need for the REGEXP_STRING
 User.prototype.REGEXP_STRING = "[0-9\\/»«\\:;'\"„“”\\]\\[\\{\\}~<>\\|\\!@#\\$%\\^&\\*\\(\\)\\+\\=\\.,_—–\\-\\?×ˈ\\/]";
 User.prototype.toUpperCase = function(string){
-	return string[0].toUpperCase() + string.slice(1);
+	return !string? '' : string[0].toUpperCase() + string.slice(1);
 };
 User.prototype.cleanText = function(string){
-	return (string || '').replace(/\.([^0-9])/g, '. $1')
+	return !string? '' : (string || '').replace(/\.([^0-9])/g, '. $1')
 		.replace(/\s+/g, ' ')
-		.replace(this.REGEXP, '') //bez /
+		.replace(this.REGEXP, '') //without /
 		.replace(new RegExp(User.prototype.specialStrings, 'g'), '')
 		.replace(/ +/g, ' ')
 		.trim();
 };
 User.prototype.specialStrings = '°C';
 User.prototype.replace = function(string, config){
+	if(!string || !config){
+		console.log('User.prototype.replace :: no data given.');
+	}
+
 	var i;
+
 	for(i in config){
 		if(config.hasOwnProperty(i)){
 			string = string.replace(':' + i, config[i]);

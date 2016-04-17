@@ -1,5 +1,4 @@
-var websocket = new WebSocket('ws://192.168.97.100:8090');
-// var websocket = new WebSocket('ws://localhost:8090');
+var websocket = new WebSocket('ws://127.0.0.1:8090');
 websocket.onopen = function(){
 	console.log('Websocket connection is open.');
 	websocket.sendJSON({

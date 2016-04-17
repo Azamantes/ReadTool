@@ -4,7 +4,6 @@
 	float: right;
 	width: 10%;
 	height: 100%;
-	/*clear: both;*/
 }
 #settings {
 	float: left;
@@ -27,7 +26,6 @@
 }
 #topbar {
 	border-radius: 25px;
-	/*box-shadow: inset 0px 0px 10px #888888;*/
 }
 #topbar > div:hover {
 	cursor: pointer;
@@ -41,7 +39,6 @@
 	border-top-right-radius: 25px;
 	border-bottom-right-radius: 25px;
 }
-
 #main-container {
 	top: 11%;
 	left: 11%;
@@ -66,12 +63,10 @@
 	top: 11%;
 	right: 1%;
 	width: 23%;
-	/*height: 50%;*/
 }
 #right-1-container > :last-child {
 	margin-bottom: 15px;
 }
-
 #topbar-container,
 #topbar-left-container,
 #topbar-right-container,
@@ -81,7 +76,6 @@
 	position: absolute;
 	box-shadow: 0px 0px 10px #888888;
 }
-
 #topbar-left-container ul {
 	visibility: hidden;
 }
@@ -97,7 +91,6 @@
 	width: 90%;
 	margin-left: 4.5%;
 }
-
 #text_reading_title {
 	text-align: center;
 }

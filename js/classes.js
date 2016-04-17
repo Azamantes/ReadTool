@@ -11,10 +11,10 @@ function CSSClass(array){
 }
 CSSClass.prototype.add = function(referenceID){
 	if(!referenceID){
-		return console.log('Given referenceID is invalid.');
+		throw new Error('Given referenceID is invalid.');
 	}
 	if(document.get(referenceID) !== null){
-		return console.log('There is already a CSS stylesheet identified by given referenceID.');
+		throw new Error('There is already a CSS stylesheet identified by given referenceID.');
 	}
 	var stylesheet = document.createElement('style');
 	stylesheet.id = referenceID;
@@ -29,7 +29,6 @@ CSSClass.prototype.set = function(stylesheet, config){
 	Object.keys(config).map(key => {
 		string += key + ' {\n';
 		config[key].toArray().map(style => {
-			// console.log(style, config[key][style]);
 			string += '\t' + style + ': ' + config[key][style] + ';\n'
 		});
 		string += '}\n';
@@ -90,7 +89,6 @@ Watchdogs.prototype.watch = function(element, event, callback){
 		throw new Error('There is no such DOM element.');
 	}
 	if(Object.prototype.toString.call(callback) !== '[object Function]'){
-		console.log(callback, callback['constructor']);
 		throw new Error('Given callback is not a function.');
 	}
 	// this.watchdogs.push({ element, callback });
@@ -103,7 +101,6 @@ Watchdogs.prototype.watchMe = function(module){
 	if(this.currentModule instanceof NinjaModule){
 		this.currentModule.close(false);
 		this.currentModule = null;
-		// throw new Error('Watchdog can watch only 1 ninja at a time.');
 	}
 	if(! (module instanceof NinjaModule)){
 		throw new Error('This is not a ninja:', module);
@@ -125,29 +122,14 @@ Watchdogs.prototype.closeModule = function(){
 Watchdogs.prototype.get = function(key){
 	if(this.values.has(key)){
 		return this.values.get(key);
-	} else console.log('There is no such value registered.');
+	} else throw new Error('There is no such value registered.');
 };
 Watchdogs.prototype.set = function(key, value){
 	if(this.values.has(key)){
-		return console.log('This property had already been set.');
+		throw new Error('This property had already been set.');
 	}
 	values.set(key, value);
 };
-
-//-------------------------
-//		RouterService
-//-------------------------
-function RouterService(){
-	this.routes = {};
-}
-RouterService.prototype.add = function(place, route, component){
-	this.routes[route] = { place, component };
-};
-RouterService.prototype.route = function(route){
-	var box = this.routes[route];
-	m.render(box.place, box.component);
-};
-
 
 //-------------------------
 //		MithrilModule
@@ -200,7 +182,9 @@ NinjaModule.prototype.bound = function(method){
 };
 NinjaModule.prototype.close = function(fog = true){
 	this.removeListeners();
-	if(this.destructor instanceof Function) this.destructor();
+	if(this.destructor instanceof Function){
+		this.destructor();
+	}
 	this.deity.unwatchModule(this);
 	if(!fog){
 		return;

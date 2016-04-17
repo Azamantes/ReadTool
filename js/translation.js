@@ -1,4 +1,4 @@
-(function(){
+(function TRANSLATION(){
 	'use strict';
 
 	var Place = {};

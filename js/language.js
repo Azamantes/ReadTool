@@ -1,4 +1,4 @@
-(function(){
+(function LANGUAGE(){
 	'use strict';
 
 	var from = null;
@@ -13,12 +13,11 @@
 	
 	function init(){
 		from = document.get('language_from').parentNode.childNodes[0];
-		to = document.get('language_to').parentNode.childNodes[0];
-
-		from.innerHTML = '';
 		from.textContent = 'From';
-		to.innerHTML = '';
+		from.innerHTML = '';
+		to = document.get('language_to').parentNode.childNodes[0];
 		to.textContent = 'To';
+		to.innerHTML = '';
 	}
 	function language_from(event){
 		if(event.target.tagName !== 'P'){

@@ -1,8 +1,9 @@
-(function(){
+(function SKY_ADD_TEXT(){
 	'use strict';
 
 	var state = new Map;
 	state.set('boolean', false);
+
 	var languages;
 
 	var Views = new Map;
@@ -25,7 +26,7 @@
 		m('button', { onclick: cancelSubmitText }, 'Ok'),
 	]);
 
-	var self = new NinjaModule(true);
+	var self = new NinjaModule(true); //true -> self.addRoute on init
 	self.listen('keydown: 50', show);
 	self.listen('websocket: languages', saveLanguages);
 	self.listen('websocket: Text Submit Success', success);
@@ -89,7 +90,6 @@
 		document.get('text_add_source_input').value = state.get('source');
 	}
 	function wipeState(){
-		// document.get('text_add_language_select').value = ''; // doesn't matter
 		document.get('text_add_title_input').value = '';
 		document.get('text_add_content_textarea').value = '';
 		document.get('text_add_source_input').value = '';

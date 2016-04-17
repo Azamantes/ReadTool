@@ -1,9 +1,10 @@
-(function(){
+(function KEYBOARD(){
 	'use strict';
 
 	var forbiddenClicks = new Set(['INPUT', 'TEXTAREA']);
 	var forbiddenKeys = new Set([9]);
 	var keyboardFree = true;
+	
 	var self = new NinjaModule;
 	self.listen('mouseclick::', checkMouse);
 	self.listen('keyboard: keydown', checkKeyboard);

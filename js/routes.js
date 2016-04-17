@@ -1,14 +1,15 @@
-(function(){
+(function SKY_ROUTES(){
 	var ROUTES = {};
 
-	var module = new NinjaModule;
-	module.listen('add route', addRoute);
-	module.listen('init routes', init);
-	module.component.view = function(){
+	var self = new NinjaModule;
+	self.listen('add route', addRoute);
+	self.listen('init routes', init);
+	self.component.view = function(){
 		return m('div');
 	};
+	
 	function init(){
-		addRoute({ route: '/', component: module.component });
+		addRoute({ route: '/', component: self.component });
 		m.route(document.get('sky'), '/', ROUTES);
 	}
 	function addRoute(data){

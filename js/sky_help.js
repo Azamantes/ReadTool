@@ -1,5 +1,6 @@
-(function(){
+(function SKY_HELP(){
 	'use strict';
+
 	var self = new NinjaModule(true); //true -> self.addRoute on init
 	self.listen('mouseclick: Help', show);
 	self.component.view = view;
@@ -9,7 +10,6 @@
 		self.show();
 		self.deity.watchMe(self);
 	}
-
 	function view(){
 		return m('div', { id: 'help_sky' }, [
 			m('h3', 'Topbar:'),
