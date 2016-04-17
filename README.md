@@ -20,6 +20,6 @@ ReadTool is keeping its own translation data in the database so even without int
 JScolor - http://jscolor.com/<br>
 Mithril - http://mithril.js.org/
 
-<p>--------------------------------</p>
+<p>----------------------------------------------</p>
 
 Feel free to e-mail me and share your thoughts. My mail: <i>azamantes@protonmail.com</i>
