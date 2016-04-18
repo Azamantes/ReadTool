@@ -98,11 +98,11 @@ Watchdogs.prototype.watchMe = function(module){
 	if(this.currentModule === module){
 		return;
 	}
-	if(this.currentModule instanceof NinjaModule){
+	if(this.currentModule instanceof SkyModule){
 		this.currentModule.close(false);
 		this.currentModule = null;
 	}
-	if(! (module instanceof NinjaModule)){
+	if(! (module instanceof SkyModule)){
 		throw new Error('This is not a ninja:', module);
 	}
 	this.currentModule = module;
