@@ -1,18 +1,18 @@
 (function SKY_ROUTES(){
-	var ROUTES = {};
-
-	var self = new SkyModule;
+	'use strict';
+	
+	var self = new SkyModule({ route: '/', view });
 	self.listen('add route', addRoute);
 	self.listen('init routes', init);
-	self.component.view = function(){
-		return m('div');
-	};
+	self.set('routes', {});
 	
 	function init(){
-		addRoute({ route: '/', component: self.component });
-		m.route(document.get('sky'), '/', ROUTES);
+		m.route(document.get('sky'), '/', self.get('routes'));
 	}
 	function addRoute(data){
-		ROUTES[data.route] = data.component;
+		self.get('routes')[data.route] = data.component;
+	}
+	function view(){
+		return m('div');
 	}
 })();

@@ -1,24 +1,22 @@
 (function KEYBOARD(){
 	'use strict';
 
-	var forbiddenClicks = new Set(['INPUT', 'TEXTAREA']);
-	var forbiddenKeys = new Set([9]);
-	var keyboardFree = true;
-	
 	var self = new SkyModule;
 	self.listen('mouseclick::', checkMouse);
 	self.listen('keyboard: keydown', checkKeyboard);
 	self.listen('keyboard: keyup', checkKeyboard);
-	self.register('keyboardFree', returnKeyboardFree);
+	self.register('keyboardFree', () => self.get('keyboardFree'));
+	self.set('forbidden: clicks', new Set(['INPUT', 'TEXTAREA']));
+	self.set('forbidden: keys', new Set([9]));
+	self.set('keyboardFree', true);
 	
 	function checkMouse(event){
-		keyboardFree = !forbiddenClicks.has(event.target.tagName);
+		var logic = self.get('forbidden: clicks').has(event.target.tagName);
+		self.set('keyboardFree', !logic);
 	}
 	function checkKeyboard(event){
-		if(!keyboardFree) return;
-		keyboardFree = !(forbiddenKeys.has(event.keyCode) && forbiddenClicks.has(event.target.tagName));
-	}
-	function returnKeyboardFree(){
-		return keyboardFree;
+		if(!self.get('keyboardFree')) return;
+		var logic = self.get('forbidden: keys').has(event.keyCode) && self.get('forbidden: clicks').has(event.target.tagName);
+		self.set('keyboardFree', !logic);
 	}
 })();

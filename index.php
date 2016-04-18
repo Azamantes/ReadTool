@@ -26,7 +26,7 @@
 	<!-- <script src='/Libraries/jscolor/jscolor.js'></script> -->
 	<script src='/Libraries/Mithril/mithril.min.js'></script>
 	<script src='js/extensions.js'></script>
-	<script src='js/classes.js'></script>
+	<script src='js/constructors.js'></script>
 	<script src='js/main.js'></script>
 	<script src='js/css.js'></script>
 	<script src='js/routes.js'></script>

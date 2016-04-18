@@ -1,10 +1,8 @@
 (function SKY_LOGOUT(){
 	'use strict';
 
-	var self = new SkyModule(true);
+	var self = new SkyModule({ route: '/logout', view });
 	self.listen('mouseclick: Logout', show);
-	self.component.view = view;
-	self.route = '/logout';
 
 	function show(){
 		self.show();

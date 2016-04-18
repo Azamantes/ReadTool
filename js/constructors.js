@@ -134,8 +134,30 @@ Watchdogs.prototype.set = function(key, value){
 //------------------------------------
 //		MithrilModule -> Main place
 //------------------------------------
-function MainModule(){}
+function MainModule(){
+	this.container = new Map; // for storing values instead of creating variables in the code.
+}
 MainModule.prototype.place = null;
+MainModule.prototype.set = function(key, value){
+	this.container.set(key, value);
+};
+MainModule.prototype.get = function(key){
+	return this.container.get(key);
+};
+MainModule.prototype.popup = {
+	place: null,
+	show: function(){
+		this.place.className = 'appear';
+	},
+	hide: function(){
+		this.place.className = 'disappear';
+	},
+	render: function(view, text){
+		m.render(this.place, view);
+		if(text) document.get('sky-confirm').innerHTML = text;
+		this.show();
+	}
+};
 MainModule.prototype.listen = function(event, callback){
 	this.deity.listen(event, callback);
 };
@@ -155,16 +177,19 @@ MainModule.prototype.bound = function(method){
 //-------------------------
 //		MithrilModule
 //-------------------------
-function SkyModule(route){
+function SkyModule(self = {}){
+	MainModule.call(this);
+	const COMPILED_VIEW = self.view && self.view() || null;
 	this.component = {
-		controller: function(){}
-		//view: function(){} -- every module will add custom view
-	};
-	this.destructor = null; //additional function to call when closing module
-	if(route === true){
+		controller: function(){},
+		view: () => COMPILED_VIEW
+	};	
+	this.route = self.route;
+	this.constructList = [];
+	this.destructor = self.destructor || null; //additional function to call when closing module
+	if(!!this.route){
 		this.listen('init', this.bound('addRoute'));
 	}
-	this.places = {};
 }
 SkyModule.descend(MainModule);
 SkyModule.prototype.addRoute = function(){
@@ -173,9 +198,13 @@ SkyModule.prototype.addRoute = function(){
 		component: this.component
 	});
 };
+SkyModule.prototype.construct = function(){
+
+};
 SkyModule.prototype.show = function(){
 	m.route(this.route);
 	this.place.className = 'appear';
+	this.construct();
 };
 
 SkyModule.prototype.close = function(fog = true){

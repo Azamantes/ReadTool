@@ -6,6 +6,8 @@
 	Watchdog.watch(window, 'load', function(){
 		MainModule.prototype.place = document.get('main');
 		SkyModule.prototype.place = document.get('sky-container');
+		MainModule.prototype.popup.place = document.get('sky-confirm-container');
+		SkyModule.prototype.popup.place = document.get('sky-confirm-container');
 		
 
 		Watchdog.init();

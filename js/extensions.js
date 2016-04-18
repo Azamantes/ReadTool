@@ -1,3 +1,4 @@
+'use strict';
 // ----------------------------
 // Native Function extensions
 // ----------------------------
@@ -5,6 +6,7 @@ Function.prototype.hasAncestor = function(ancestor){
 	return !!(this.prototype.constructors && this.prototype.constructors.has(ancestor));
 };
 Function.prototype.descend = function(constructor){
+	let i;
 	for(i in constructor.prototype){
 		if(constructor.prototype.hasOwnProperty(i)){
 			this.prototype[i] = constructor.prototype[i];

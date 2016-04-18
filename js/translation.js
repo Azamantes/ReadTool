@@ -1,40 +1,36 @@
 (function TRANSLATION(){
 	'use strict';
 
-	var Place = {};
-	var lastTry;
-	var chilling = true;
-
 	var self = new MainModule;
 	self.listen('init', init);
 	self.listen('translation: from', catchThat);
-	self.listen('translation: Chill Out', chillOut);
+	self.listen('translation: Chill Out', () => self.set('chilling', true));
 	self.listen('websocket: Translation Found', found);
 	self.listen('websocket: Translation Added', clearAddTranslation);
-	
+	self.set('chilling', true);
+	// self.set('lastTry', null);
+	self.set('place: from', null);
+	self.set('place: to', null);
+	self.set('place: found', null);
+
 	function init(){
-		Place.from = document.get('translation_add_from');
-		Place.to = document.get('translation_add_to');
-		Place.find = document.get('translation_find');
-		Place.found = document.get('translation_found');
+		self.set('place: from', document.get('translation_add_from'));
+		self.set('place: to', document.get('translation_add_to'));
+		self.set('place: found', document.get('translation_found'));
 		self.watch('translation_add_to', 'keydown', readySteady); // send translation via websocket
 		self.watch('translation_find', 'keydown', findTranslation);
 	}
-	function chillOut(){
-		chilling = true;
-	}
 	function catchThat(string){
-		if(!!string){
-			Place.from.value = string;
-			Place.to.focus();
-			chilling = false;
-		}
+		if(!string) return;
+		self.get('place: from').value = string;
+		self.get('place: to').focus();
+		self.set('chilling', false);
 	}
 	function findTranslation(event){
-		if(event.keyCode !== 13 || this.value === lastTry){
+		if(event.keyCode !== 13 || this.value ===  self.get('lastTry')){
 			return; // nothind to do.
 		}
-		lastTry = this.value;
+		self.set('lastTry', this.value);
 		websocket.sendJSON({
 			event: 'getTranslation',
 			from: this.value,
@@ -45,20 +41,18 @@
 		if(event.keyCode !== 13){
 			return; //not enter or not focused
 		}
-		let from = Place.from.value;
-		let to = this.value;
+		let from = self.get('place: from').value,
+			to = this.value;
 		if(!from || !to){
 			return;
 		}
-		websocket.sendJSON({
-			event: 'addTranslation',
-			from: from,
-			to: to
-		});
+		websocket.sendJSON({ event: 'addTranslation', from, to });
 	}
 	function clearAddTranslation(){
-		if(chilling) Place.from.value = '';
-		Place.to.value = '';
+		if(self.get('chilling')){
+			self.get('place: from').value = '';
+		}
+		self.get('place: to').value = '';
 	}
 	function found(data){
 		var list = document.createElement('UL');
@@ -69,6 +63,6 @@
 			box.textContent = item;
 			list.appendChild(box);
 		});
-		Place.found.replaceChild(list, Place.found.firstChild);
+		self.get('place: found').replaceChild(list, self.get('place: found').firstChild);
 	}
 })();

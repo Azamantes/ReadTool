@@ -1,22 +1,16 @@
 (function SKY_BROWSE_TEXTS(){
 	'use strict';
 
-	var place;
-	var state = new Map;
-	state.set('boolean', false);
-
-	var self = new SkyModule(true); //true -> self.addRoute on init
+	var self = new SkyModule({ route: '/text_browser', view, destructor: saveState }); //true -> self.addRoute on init
 	self.listen('keydown: 49', show);
 	self.listen('websocket: titles', putContent);
-	self.component.view = view;
-	self.route = '/text_browser';
-	self.destructor = saveState;
+	self.set('boolean', false);
 
 	function show(){
 		self.deity.watchMe(self);
 		self.show();
-		place = document.get('text_browser_content');
-		self.deity.watch(place, 'click', selectTitle);
+		self.set('place', document.get('text_browser_content'));
+		self.deity.watch(self.get('place'), 'click', selectTitle);
 		restoreState();
 	}
 	function view(){
@@ -71,45 +65,39 @@
 		if(id === NaN || id <= 0){
 			return; // really?
 		}
-		console.log('Wybrano tytul:', id);
-		websocket.sendJSON({
-			event: 'pullText',
-			id: id
-		});
+		websocket.sendJSON({ event: 'pullText', id: id });
 	}
 	function putContent(data){
-		data = data.data;
-		var box;
 		var fragment = document.createDocumentFragment();
-		var div;
-
-		data.map(text => {
+		var span = document.createElement('span');
+		var div, box;
+		data.data.map(text => {
 			div = document.createElement('DIV');
 			div.id = 'title#' + text.id;
 			div.className = 'text-title';
-			div.appendChild(document.createElement('span'));
-			div.appendChild(document.createElement('span'));
+			div.appendChild(span.cloneNode());
+			div.appendChild(span.cloneNode());
 			div.childNodes[0].textContent = text.title;
 			div.childNodes[1].textContent = text.length + ' | ' + text.author + ' | ' + text.language;
 			fragment.appendChild(div);
 		});
-		place.innerHTML = '';
-		place.appendChild(fragment.cloneNode(true));
+		self.get('place').innerHTML = '';
+		self.get('place').appendChild(fragment.cloneNode(true));
 	}
 	function saveState(){
-		state.set('boolean', true);
-		state.set('sort_what', document.get('browser_sort_what').value);
-		state.set('sort_how', document.get('browser_sort_how').value);
-		state.set('contains', document.get('browser_contains').value);
-		state.set('content', document.get('text_browser_content').innerHTML);
+		self.set('boolean', true);
+		self.set('sort_what', document.get('browser_sort_what').value);
+		self.set('sort_how', document.get('browser_sort_how').value);
+		self.set('contains', document.get('browser_contains').value);
+		self.set('content', document.get('text_browser_content').innerHTML);
 	}
 	function restoreState(){
-		if(!state.get('boolean')){
+		if(!self.get('boolean')){
 			return;
 		}
-		document.get('browser_sort_what').value = state.get('sort_what');
-		document.get('browser_sort_how').value = state.get('sort_how');
-		document.get('browser_contains').value = state.get('contains');
-		document.get('text_browser_content').innerHTML = state.get('content');
+		document.get('browser_sort_what').value = self.get('sort_what');
+		document.get('browser_sort_how').value = self.get('sort_how');
+		document.get('browser_contains').value = self.get('contains');
+		document.get('text_browser_content').innerHTML = self.get('content');
 	}
 })();

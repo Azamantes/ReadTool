@@ -1,23 +1,24 @@
 (function LANGUAGE(){
 	'use strict';
 
-	var from = null;
-	var to = null;
-
 	var self = new MainModule;
 	self.listen('init', init);
 	self.listen('mouseclick: Language From', language_from);
 	self.listen('mouseclick: Language To', language_to);
-	self.listen('websocket: Language From', setFrom);
-	self.listen('websocket: Language To', setTo);
+	self.listen('websocket: Language From', (data) => {
+		self.get('from').textContent = 'From: [' + data.data + ']';
+	});
+	self.listen('websocket: Language To', (data) => {
+		self.get('to').textContent = 'To: [' + data.data + ']';
+	});
 	
 	function init(){
-		from = document.get('language_from').parentNode.childNodes[0];
-		from.textContent = 'From';
-		from.innerHTML = '';
-		to = document.get('language_to').parentNode.childNodes[0];
-		to.textContent = 'To';
-		to.innerHTML = '';
+		self.set('from', document.get('language_from').parentNode.childNodes[0]);
+		self.get('from').textContent = 'From';
+		self.get('from').innerHTML = '';
+		self.set('to', document.get('language_to').parentNode.childNodes[0]);
+		self.get('to').textContent = 'To';
+		self.get('to').innerHTML = '';
 	}
 	function language_from(event){
 		if(event.target.tagName !== 'P'){
@@ -36,11 +37,5 @@
 			event: 'changeLanguageTo',
 			data: event.target.textContent
 		});
-	}
-	function setFrom(data){
-		from.textContent = 'From: [' + data.data + ']'
-	}
-	function setTo(data){
-		to.textContent = 'To: [' + data.data + ']'
 	}
 })();

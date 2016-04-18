@@ -1,6 +1,8 @@
 (function TEXT(){
 	'use strict';
 	
+	// I'll leave normal variables here.
+
 	var Words = new Map;
 	var Text = new Map; // overwriting native Text function
 	var allowedTags = new Set(['x', 'y']);
