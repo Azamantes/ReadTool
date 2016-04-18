@@ -131,11 +131,31 @@ Watchdogs.prototype.set = function(key, value){
 	values.set(key, value);
 };
 
+//------------------------------------
+//		MithrilModule -> Main place
+//------------------------------------
+function MainModule(){}
+MainModule.prototype.place = null;
+MainModule.prototype.listen = function(event, callback){
+	this.deity.listen(event, callback);
+};
+MainModule.prototype.request = function(value){
+	return this.deity.request(value);
+};
+MainModule.prototype.register = function(event, callback){
+	this.deity.register(event, callback);
+};
+MainModule.prototype.watch = function(element, event, callback){
+	document.get(element).addEventListener(event, callback);
+};
+MainModule.prototype.bound = function(method){
+	return this[method].bind(this);
+};
+
 //-------------------------
 //		MithrilModule
 //-------------------------
-function NinjaModule(route){
-	this.buttons = [];
+function SkyModule(route){
 	this.component = {
 		controller: function(){}
 		//view: function(){} -- every module will add custom view
@@ -144,44 +164,21 @@ function NinjaModule(route){
 	if(route === true){
 		this.listen('init', this.bound('addRoute'));
 	}
+	this.places = {};
 }
-NinjaModule.prototype.place = null;
-NinjaModule.prototype.addButtonOnce = function(buttonID, callback){
-	document.get(buttonID).addEventListener('click', callback);
-};
-NinjaModule.prototype.addButton = function(buttonID, callback){
-	var button = document.get(buttonID);
-	this.buttons.push(button);
-	button.addEventListener('click', (callback instanceof Function? callback : this.click));
-};
-NinjaModule.prototype.removeListeners = function(){
-	this.buttons.map(button => button.removeEventListener('click', this.click));
-	this.buttons = [];
-};
-NinjaModule.prototype.listen = function(event, callback){
-	this.deity.listen(event, callback);
-};
-NinjaModule.prototype.request = function(value){
-	return this.deity.request(value);
-};
-NinjaModule.prototype.register = function(event, callback){
-	this.deity.register(event, callback);
-};
-NinjaModule.prototype.addRoute = function(){
+SkyModule.descend(MainModule);
+SkyModule.prototype.addRoute = function(){
 	this.deity.shout('add route', {
 		route: this.route,
 		component: this.component
 	});
 };
-NinjaModule.prototype.show = function(){
+SkyModule.prototype.show = function(){
 	m.route(this.route);
 	this.place.className = 'appear';
 };
-NinjaModule.prototype.bound = function(method){
-	return this[method].bind(this);
-};
-NinjaModule.prototype.close = function(fog = true){
-	this.removeListeners();
+
+SkyModule.prototype.close = function(fog = true){
 	if(this.destructor instanceof Function){
 		this.destructor();
 	}
@@ -195,19 +192,4 @@ NinjaModule.prototype.close = function(fog = true){
 			this.place.className = 'hidden';
 		}
 	}, 250);
-};
-
-//------------------------------------
-//		MithrilModule -> Main place
-//------------------------------------
-function MainModule(){}
-MainModule.prototype.place = null;
-MainModule.prototype.listen = function(event, callback){
-	this.deity.listen(event, callback);
-};
-MainModule.prototype.request = function(value){
-	return this.deity.request(value);
-};
-MainModule.prototype.watch = function(element, event, callback){
-	document.get(element).addEventListener(event, callback);
 };

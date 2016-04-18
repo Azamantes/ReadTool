@@ -1,7 +1,8 @@
 const Watchdog = new Watchdogs;
 
-NinjaModule.prototype.deity = Watchdog;
 MainModule.prototype.deity = Watchdog;
+SkyModule.prototype.deity = Watchdog;
+
 
 // function M(){
 // 	var PLACE = {};

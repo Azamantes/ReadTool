@@ -1,7 +1,7 @@
 (function SKY_ROUTES(){
 	var ROUTES = {};
 
-	var self = new NinjaModule;
+	var self = new SkyModule;
 	self.listen('add route', addRoute);
 	self.listen('init routes', init);
 	self.component.view = function(){

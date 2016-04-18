@@ -5,7 +5,7 @@
 	var state = new Map;
 	state.set('boolean', false);
 
-	var self = new NinjaModule(true); //true -> self.addRoute on init
+	var self = new SkyModule(true); //true -> self.addRoute on init
 	self.listen('keydown: 49', show);
 	self.listen('websocket: titles', putContent);
 	self.component.view = view;

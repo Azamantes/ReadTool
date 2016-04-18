@@ -1,7 +1,7 @@
 (function SKY_LOGOUT(){
 	'use strict';
 
-	var self = new NinjaModule(true);
+	var self = new SkyModule(true);
 	self.listen('mouseclick: Logout', show);
 	self.component.view = view;
 	self.route = '/logout';

@@ -26,7 +26,7 @@
 		m('button', { onclick: cancelSubmitText }, 'Ok'),
 	]);
 
-	var self = new NinjaModule(true); //true -> self.addRoute on init
+	var self = new SkyModule(true); //true -> self.addRoute on init
 	self.listen('keydown: 50', show);
 	self.listen('websocket: languages', saveLanguages);
 	self.listen('websocket: Text Submit Success', success);

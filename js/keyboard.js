@@ -5,7 +5,7 @@
 	var forbiddenKeys = new Set([9]);
 	var keyboardFree = true;
 	
-	var self = new NinjaModule;
+	var self = new SkyModule;
 	self.listen('mouseclick::', checkMouse);
 	self.listen('keyboard: keydown', checkKeyboard);
 	self.listen('keyboard: keyup', checkKeyboard);

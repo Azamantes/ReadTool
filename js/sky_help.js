@@ -1,7 +1,7 @@
 (function SKY_HELP(){
 	'use strict';
 
-	var self = new NinjaModule(true); //true -> self.addRoute on init
+	var self = new SkyModule(true); //true -> self.addRoute on init
 	self.listen('mouseclick: Help', show);
 	self.component.view = view;
 	self.route = '/help';

@@ -35,7 +35,7 @@
 		} }, 'Ok')
 	]);
 
-	var self = new NinjaModule(true); //true -> self.addRoute on init
+	var self = new SkyModule(true); //true -> self.addRoute on init
 	self.listen('mouseclick: Settings', show);
 	self.listen('websocket: Password Incorrect', incorrectPassword);
 	self.listen('websocket: Password Changed', changedPassword);
@@ -78,17 +78,13 @@
 		]
 	}
 	function setPassword(){
-		var password = Place.password.input.value;
-		if(password === ''){
-			incorrectPassword();
-		}
 		websocket.sendJSON({
 			event: 'changePassword',
-			password: password
+			password: Place.password.input.value
 		});
 	}
 	function renderPopup(value, text){
-		m.render(document.get('sky-confirm-container'), Views.get(value));
+		m.render(Place.popup, Views.get(value));
 		if(text) document.get('sky-confirm').innerHTML = text;
 	}
 	function incorrectPassword(){

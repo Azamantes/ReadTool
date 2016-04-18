@@ -4,8 +4,9 @@
 		websocket.close();
 	});
 	Watchdog.watch(window, 'load', function(){
-		NinjaModule.prototype.place = document.get('sky-container');
 		MainModule.prototype.place = document.get('main');
+		SkyModule.prototype.place = document.get('sky-container');
+		
 
 		Watchdog.init();
 		Watchdog.shout('init routes');
