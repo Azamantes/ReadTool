@@ -5,13 +5,14 @@
 
 Version is going to shift from (0.1 -> 1.0), (0.2 -> 2.0) and so on whenever I feel the time has come.
 
-<h1>Current version: 0.0.12<b></b></h1>
+<h1>Current version: 0.1<b></b></h1>
 
-<b>Milestone almost reached (1 feature left). Soon shift to 0.1.0.</b>
+<b>Milestone reached. Version shifted (0.0.13) -> (0.1).</b>
 
-<b>Version:</b> 0.0.12
+<b>Version:</b> 0.0.13
 <ul>
   <li>Registration, users can see each other's submitted texts</li>
+  <li>Changing password (Settings)</li>
   <li>Improved text adding (small popups with useful information). Confirmation of chosen text language required.</li>
   <li>Finding translation for given word in the "Find translation" section</li>
   <li>When you accidentally submit the same text and set 2 different languages you couldn't properly highlight words when reading. This was fixed.</li>

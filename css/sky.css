@@ -97,7 +97,7 @@
 	line-height: 20px;
 }
 #text_browser_topbar > button {
-	height: 20px;
+	height: 23px;
 	line-height: 15px;
 }
 #text_browser_topbar > *:not(:last-child) {
@@ -122,6 +122,7 @@
 
 #text_browser_browse {
 	float: right;
+	height: 30px;
 }
 
 /* --------------
@@ -179,4 +180,29 @@
 }
 #sky-confirm-container button {
 	float: right;
+}
+
+/* --------------
+	Settings
+ --------------- */
+ #settings_sky {
+ 	padding: 10px;
+
+ 	position: absolute;
+ 	/*outline: 1px solid black;*/
+ 	top: 10%;
+ 	left: 25%;
+ 	right: 25%;
+ 	height: auto;
+
+ 	overflow-y: auto;
+ }
+#settings-password-container button {
+	border-radius: 0px;
+	float: right;
+}
+#settings-password-container input {
+	/*float: right;*/
+	width: 75%;
+	margin: 0px 20px;
 }

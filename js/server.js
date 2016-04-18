@@ -32,8 +32,6 @@ const database = require('mysql').createConnection({
 	});
 })();
 
-
-
 server.on('connection', function(client){
 	var user = new User(client);
 	client.on('message', function(data){
@@ -61,6 +59,7 @@ User.prototype.database = database;
 User.prototype.events = new Set([
 	'connect',
 	'disconnect',
+	'changePassword',
 	'changeLanguageFrom',
 	'changeLanguageTo',
 	'submitText',
@@ -381,12 +380,20 @@ User.prototype.pullText = function(data){
  * PASSWORD
 */
 User.prototype.changePassword = function(data){
-	if(!data){
+	var password = data.password;
+	if(!password){
+		this.unicast({ event: 'Password Incorrect' });
 		return console.log('User.prototype.changePassword :: no data given.');
 	}
+	var box = false;
 	database.query(SQL_QUERIES.changePassword, [data.password, this.userID])
-	.on('end', () => {
-		console.log(this.login, 'changed password.');
+	.on('result', (row) => {
+		if(!!row.affectedRows) box = true;
+		console.log('row.affectedRows:', row.affectedRows);
+	}).on('end', () => {
+		if(box) console.log(this.login, 'changed password.');
+		console.log('Box:', box);
+		this.unicast({ event: 'Password ' + (box? 'Changed' : 'Incorrect') });
 	});
 };
 

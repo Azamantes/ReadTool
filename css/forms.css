@@ -18,7 +18,10 @@
 	margin: 0px;
 }
 .form-body-left {
-	min-width: 130px;
+	flex: 0.15;
+}
+.form-body-right {
+	flex: 0.85;
 }
 .form-body-left span {
 	line-height: 23px;

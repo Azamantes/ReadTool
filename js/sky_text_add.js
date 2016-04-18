@@ -63,8 +63,7 @@
 					]),
 					m('div', { id: 'text_add_submit' }, [
 						m('button', { id: 'text_add_submit', onclick: beforeSubmitText }, 'Add text')
-					]),
-					m('div', { id: 'sky-confirm-container', class: 'hidden' }, Views.get('initial'))
+					])
 				])
 			])
 		]
@@ -104,11 +103,17 @@
 		var select = document.get('text_add_language_select');
 		var language = select.options[parseInt(select.value) - 1].text;
 		renderPopup('confirmation', 'Are you sure the selected language <b>[' + language + ']</b> is correct?');
+		showPopup();
+	}
+	function showPopup(){
 		document.get('sky-confirm-container').className = 'appear';
+	}
+	function hidePopup(){
+		document.get('sky-confirm-container').className = 'disappear';
 	}
 	function submitText(event){
 		event.preventDefault();
-		document.get('sky-confirm-container').className = 'disappear';
+		hidePopup();
 		setTimeout(function(){
 			websocket.sendJSON({
 				event: 'submitText',
@@ -121,17 +126,17 @@
 	}
 	function cancelSubmitText(event){
 		event.preventDefault();
-		document.get('sky-confirm-container').className = 'disappear';
+		hidePopup();
 	}
 	function success(data){
 		wipeState();
 		renderPopup('success');
 		setTimeout(function(){
-			document.get('sky-confirm-container').className = 'appear';
+			showPopup();
 		}, 250);
 	}
 	function endSubmit(){
-		document.get('sky-confirm-container').className = 'disappear';
+		hidePopup();
 		setTimeout(function(){
 			renderPopup('initial')
 		}, 250);

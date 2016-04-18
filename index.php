@@ -40,11 +40,20 @@
 	<script src='js/sky_logout.js'></script>
 	<script src='js/sky_text_browser.js'></script>
 	<script src='js/sky_text_add.js'></script>
+	<script src='js/sky_settings.js'></script>
+	<style>
+		g {
+			color: green;
+		}
+		r {
+			color: red;
+		}
+	</style>
 </head>
 <body>
 	<div id='topbar-container' class='field'>
 		<div id='topbar' class='relative'>
-			<div id='settings'>
+			<div id='settings' event='Settings'>
 				<span>Settings</span>
 				<!-- <input id='color' class='color' style='cursor:context-menu' > -->
 			</div>
@@ -137,6 +146,7 @@
 	<div id='sky-container'  class='hidden'>
 		<div id='fog'></div>
 		<div id='sky' class='.relative'></div>
+		<div id='sky-confirm-container' class='hidden'></div>
 	</div>
 </body>
 
