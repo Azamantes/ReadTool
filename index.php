@@ -42,12 +42,8 @@
 	<script src='js/sky_text_add.js'></script>
 	<script src='js/sky_settings.js'></script>
 	<style>
-		g {
-			color: green;
-		}
-		r {
-			color: red;
-		}
+		g { color: green }
+		r { color: red }
 	</style>
 </head>
 <body>

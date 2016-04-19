@@ -3,8 +3,8 @@
 	
 	// I'll leave normal variables here.
 
-	var Words = new Map;
-	var Text = new Map; // overwriting native Text function
+	var Words = new Object.Map;
+	var Text = new Object.Map; // overwriting native Text function
 	var allowedTags = new Set(['x', 'y']);
 	var CleanIndexesDOM;
 	var CleanDOMReferences; // Map :: maps

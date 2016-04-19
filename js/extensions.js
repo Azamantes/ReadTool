@@ -46,12 +46,30 @@ JSON.cleanString = function(value){
 console.log('JSON.cleanString -> JSON.stringify without " inside the string.');
 
 // ----------------------------
-// Native Map extensions
+// Custom Map constructor
 // ----------------------------
-Map.prototype.toArray = function(key){
-	return Array.from(this.get(key) || []);
+Object.Map = function(){
+	this.container = {};
 };
-console.log('Map.prototype.toArray -> returns array of values under given key.');
+Object.Map.prototype.set = function(key, value){
+	this.container[key] = value;
+};
+Object.Map.prototype.get = function(key){
+	return this.container[key];
+};
+Object.Map.prototype.has = function(key){
+	return !!this.container[key];
+};
+Object.Map.prototype.delete = function(key){
+	if(!this.container[key]) return;
+	this.container[key] = undefined;
+	// delete this.container[key];
+};
+
+// Map.prototype.toArray = function(key){
+// 	return Array.from(this.get(key) || []);
+// };
+// console.log('Map.prototype.toArray -> returns array of values under given key.');
 
 // ----------------------------
 // Native String extensions

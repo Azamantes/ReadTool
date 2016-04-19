@@ -40,44 +40,44 @@ CSSClass.prototype.set = function(stylesheet, config){
 //		Watchdogs
 //-------------------------
 function Watchdogs(){
-	this.events = new Map;
-	this.requests = new Map;
+	this.events = new Object.Map;
+	this.requests = new Object.Map;
 	// this.watchdogs = new Set;
 	this.currentModule = null;
-	this.values = new Map;
+	this.values = new Object.Map;
 }
 Watchdogs.prototype.init = function(){
 	this.shout('init: routes');
-	this.events.toArray('init').map(initialize => initialize());
-	this.events.delete('init');
-}
+	this.events.get('init').map(initialize => initialize());
+	this.events.set('init', []);
+};
 Watchdogs.prototype.listen = function(event, listener){
 	if(! (listener instanceof Function)){
 		throw new Error('Provided listener is not a function.');
 	}
 	if(!this.events.has(event)){
-		this.events.set(event, new Set);
+		this.events.set(event, []);
 	}
-	this.events.get(event).add(listener);
+	this.events.get(event).push(listener);
 };
 Watchdogs.prototype.shout = function(event, message){
 	if(!this.events.has(event)){
 		return;
 	}
-	this.events.toArray(event).map(listener => listener(message));
+	this.events.get(event).map(listener => listener(message));
 };
 Watchdogs.prototype.register = function(request, listener){ // (string, function) // listener makes his private values available for others
 	if(this.requests.has(request)){
 		throw new Error('Sandbox:', request, ' -> Already registered.');
 	}
 	this.requests.set(request, listener);
-}
+};
 Watchdogs.prototype.request = function(request, waiting){ // (string, function)
 	if(!this.requests.has(request)){
 		throw new Error('No registered value for request \'' + request + '\'.');
 	}
 	return this.requests.get(request)();
-}
+};
 Watchdogs.prototype.watch = function(element, event, callback){
 	if(!element) throw new Error('No element given.');
 	if(!event) throw new Error('No event given.');
@@ -118,7 +118,7 @@ Watchdogs.prototype.closeModule = function(){
 		return;
 	}
 	this.currentModule.close();
-}
+};
 Watchdogs.prototype.get = function(key){
 	if(this.values.has(key)){
 		return this.values.get(key);
@@ -135,14 +135,14 @@ Watchdogs.prototype.set = function(key, value){
 //		MithrilModule -> Main place
 //------------------------------------
 function MainModule(){
-	this.container = new Map; // for storing values instead of creating variables in the code.
+	this.container = {}; // for storing values instead of creating variables in the code.
 }
 MainModule.prototype.place = null;
 MainModule.prototype.set = function(key, value){
-	this.container.set(key, value);
+	this.container[key] = value;
 };
 MainModule.prototype.get = function(key){
-	return this.container.get(key);
+	return this.container[key];
 };
 MainModule.prototype.popup = {
 	place: null,
