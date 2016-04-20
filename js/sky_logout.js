@@ -2,7 +2,7 @@
 	'use strict';
 
 	var self = new SkyModule({ route: '/logout', view });
-	self.listen('mouseclick: Logout', show);
+	self.listen('menu: Logout', show);
 
 	function show(){
 		self.show();

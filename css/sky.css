@@ -24,11 +24,12 @@
 	Help
  --------------- */
 #help_sky {
-	padding: 15px;
-	width: 30%;
-	/*height: 30%;*/
+	position: absolute;
+	top: 10%;
+	left: 25%;
+	right: 25%;
 	height: auto;
-	margin: 25% 35%;
+	padding: 15px;
 	/*border-radius: 50px;*/
 }
 #logout_sky {

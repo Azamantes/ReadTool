@@ -35,8 +35,14 @@ console.log('Object.prototype.toArray -> returns array of pais [key, value]');
 // Native Document extensions
 // ----------------------------
 document.get = document.getElementById;
-console.log('document.get -> shorthand for document.getElementById');
+document.Fragment = new Proxy(function(){}, {
+	construct: function(target, argumentsList, newTarget){
+		return document.createDocumentFragment();
+	}
+});
 
+console.log('document.get -> shorthand for document.getElementById');
+console.log('new document.Fragment -> same as document.createDocumentFragment()');
 // ----------------------------
 // Native JSON extensions
 // ----------------------------
@@ -44,27 +50,6 @@ JSON.cleanString = function(value){
 	return JSON.stringify(value).replace(/"/g, '');
 };
 console.log('JSON.cleanString -> JSON.stringify without " inside the string.');
-
-// ----------------------------
-// Custom Map constructor
-// ----------------------------
-Object.Map = function(){
-	this.container = {};
-};
-Object.Map.prototype.set = function(key, value){
-	this.container[key] = value;
-};
-Object.Map.prototype.get = function(key){
-	return this.container[key];
-};
-Object.Map.prototype.has = function(key){
-	return !!this.container[key];
-};
-Object.Map.prototype.delete = function(key){
-	if(!this.container[key]) return;
-	this.container[key] = undefined;
-	// delete this.container[key];
-};
 
 // Map.prototype.toArray = function(key){
 // 	return Array.from(this.get(key) || []);

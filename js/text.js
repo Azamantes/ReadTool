@@ -20,11 +20,10 @@
 	};
 
 	var self = new MainModule;
-	self.main = null;
 	self.listen('init', init);
 	self.listen('keydown: 49', hideTranslation);
 	self.listen('keydown: 50', hideTranslation);
-	self.listen('mouseclick: menu: Text', render);
+	self.listen('menu: Read Text', restoreState);
 	self.listen('websocket: pulledText', parseText);
 	self.listen('websocket: language: Words', gotMyWords);
 	self.listen('websocket: Translation Got', gotTranslation);
@@ -39,6 +38,10 @@
 	}
 	function setRegExp(data){
 		REGEXP = new RegExp(data.data, 'g');
+	}
+	function restoreState(){
+		render();
+		bindDOMReferences();
 	}
 	function parseText(data){
 		var LANGUAGE_WORDS = Words.get(data.language),

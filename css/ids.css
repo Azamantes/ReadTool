@@ -14,33 +14,33 @@
 #topbar-container {
 	cursor: default;
 	top: 1%;
-	left: 1%;
 	right: 1%;
+	width: 23%;
 	height: 50px;
+	border-top-radius: 25px;
+}
+#topbar {
+	border-top-radius: 25px;
 }
 #topbar > div {
+	width: 50%;
 	height: 50px;
 	font-size:25px;
 	line-height: 50px;
 	text-align: center;
 }
-#topbar {
-	border-radius: 25px;
-}
 #topbar > div:hover {
 	cursor: pointer;
 	box-shadow: inset 0px 0px 10px #888888;
 }
-#topbar > :first-child {
+#topbar > :last-child {
 	border-top-left-radius: 25px;
-	border-bottom-left-radius: 25px;
 }
-#topbar > :nth-child(2) {
+#topbar > :first-child {
 	border-top-right-radius: 25px;
-	border-bottom-right-radius: 25px;
 }
 #main-container {
-	top: 11%;
+	top: 1%;
 	left: 11%;
 	right: 25%;
 	bottom: 1%;
@@ -51,13 +51,10 @@
 	overflow-y: scroll;
 	cursor: default;
 }
-#left-1-container {
-	top: 11%;
+#menu-container {
+	top: 1%;
 	left: 1%;
 	width: 9%;
-}
-#left-1-menu {
-	color: lightgrey;
 }
 #right-1-container {
 	top: 11%;
@@ -71,7 +68,7 @@
 #topbar-left-container,
 #topbar-right-container,
 #main-container,
-#left-1-container,
+#menu-container,
 #right-1-container {
 	position: absolute;
 	box-shadow: 0px 0px 10px #888888;

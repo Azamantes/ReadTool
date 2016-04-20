@@ -2,7 +2,7 @@
 	'use strict';
 
 	var self = new SkyModule({ route: '/help', view }); //true -> self.addRoute on init
-	self.listen('mouseclick: Help', show);
+	self.listen('menu: Help', show);
 
 	function show(){
 		self.show();

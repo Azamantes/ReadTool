@@ -36,8 +36,9 @@
 		Watchdog.watch('main', 'mouseover', function(event){
 			Watchdog.shout('mouseover: main', event);
 		});
-		Watchdog.watch('left-1-menu', 'click', function(event){
-			Watchdog.shout('mouseclick: menu: ' + event.target.textContent);
+		Watchdog.watch('menu', 'click', function(event){
+			console.log('menu: ' + event.target.getAttribute('event'));
+			Watchdog.shout('menu: ' + event.target.getAttribute('event'));
 		});
 		// ------------
 		// Top bar

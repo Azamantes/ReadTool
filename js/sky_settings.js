@@ -2,7 +2,7 @@
 	'use strict';
 
 	var self = new SkyModule({ route: '/settings', view, destructor });
-	self.listen('mouseclick: Settings', show);
+	self.listen('menu: Settings', show);
 	self.listen('websocket: Password Incorrect', incorrectPassword);
 	self.listen('websocket: Password Changed', changedPassword);
 	self.set('view: confirmation', [

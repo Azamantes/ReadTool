@@ -35,6 +35,7 @@
 	<script src='js/keyboard.js'></script>
 	<script src='js/language.js'></script>
 	<script src='js/text.js'></script>
+	<script src='js/words.js'></script>
 	<script src='js/translation.js'></script>
 	<script src='js/sky_help.js'></script>
 	<script src='js/sky_logout.js'></script>
@@ -49,12 +50,6 @@
 <body>
 	<div id='topbar-container' class='field'>
 		<div id='topbar' class='relative'>
-			<div id='settings' event='Settings'>
-				<span>Settings</span>
-				<!-- <input id='color' class='color' style='cursor:context-menu' > -->
-			</div>
-			<div id='logout' event='Logout'>Logout</div>
-			<div id='help' event='Help'>Help</div>
 			<div class='topbar-language'>
 				<span></span>
 				<div id='language_to' class='dropdown' event='Language To'></div>
@@ -82,7 +77,7 @@
 							<li>przeczytanych</li>
 							<li>w danym jezyku</li>
 							<li>nie dluzszy niz X znakow</li>
-							<li>z podanej kategorii</li>
+							<li>z podanej kategorii</li> // hashtagi?
 						</ul>
 					</li>
 				</ul>
@@ -115,12 +110,17 @@
 			</div> -->
 		</div>
 	</div>	
-	<div id='left-1-container' class='field'>
+	<div id='menu-container' class='field'>
 		<!-- <h2>MENU</h2> -->
-		<div id='left-1-menu' class='menu'>
-			<p class='menuitem'>Texts</p>
-			<p class='menuitem'>Words</p>
-			<p class='menuitem'>Phrases</p>
+		<div id='menu' class='menu'>
+			<p class='menuitem' event='Read Text'>Read text</p>
+			<p class='menuitem' event='Words'>Words</p>
+			<p class='menuitem' event='Phrases'>Phrases</p>
+			<p class='menuitem' event='Sentences'>Sentences</p>
+			<hr>
+			<p class='menuitem' event='Settings'>Settings</p>
+			<p class='menuitem' event='Help'>Help</p>
+			<p class='menuitem' event='Logout'>Logout</p>
 		</div>
 	</div>
 	<div id='right-1-container' class='field'>

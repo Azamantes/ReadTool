@@ -36,6 +36,28 @@ CSSClass.prototype.set = function(stylesheet, config){
 	this.stylesheets[stylesheet].ref.textContent = string;
 };
 
+// ----------------------------
+// Custom Map constructor
+// ----------------------------
+Object.Map = function(){
+	this.container = {};
+	this.keys = new Set;
+};
+Object.Map.prototype.set = function(key, value){
+	this.container[key] = value;
+	this.keys.add(key);
+};
+Object.Map.prototype.get = function(key){
+	return this.container[key]; // a bit faster?
+	// return this.keys.has(key)? this.container[key] : undefined;
+};
+Object.Map.prototype.has = function(key){
+	return this.keys.has(key);
+};
+Object.Map.prototype.delete = function(key){
+	this.keys.delete(key);
+};
+
 //-------------------------
 //		Watchdogs
 //-------------------------
@@ -101,9 +123,9 @@ Watchdogs.prototype.watchMe = function(module){
 	if(this.currentModule instanceof SkyModule){
 		this.currentModule.close(false);
 		this.currentModule = null;
-	}
-	if(! (module instanceof SkyModule)){
-		throw new Error('This is not a ninja:', module);
+	} else if(this.currentModule instanceof MainModule){
+		this.currentModule.close();
+		this.currentModule = null;
 	}
 	this.currentModule = module;
 };
@@ -134,16 +156,15 @@ Watchdogs.prototype.set = function(key, value){
 //------------------------------------
 //		MithrilModule -> Main place
 //------------------------------------
-function MainModule(){
-	this.container = {}; // for storing values instead of creating variables in the code.
+function MainModule(self = {}){
+	this.view_compiled = self.view && self.view() || null;
+
+	Object.Map.call(this);
+
+
 }
+MainModule.descend(Object.Map);
 MainModule.prototype.place = null;
-MainModule.prototype.set = function(key, value){
-	this.container[key] = value;
-};
-MainModule.prototype.get = function(key){
-	return this.container[key];
-};
 MainModule.prototype.popup = {
 	place: null,
 	show: function(){
@@ -178,14 +199,14 @@ MainModule.prototype.bound = function(method){
 //		MithrilModule
 //-------------------------
 function SkyModule(self = {}){
-	MainModule.call(this);
-	const COMPILED_VIEW = self.view && self.view() || null;
+	MainModule.call(this, self);
+	
 	this.component = {
 		controller: function(){},
-		view: () => COMPILED_VIEW
+		view: () => this.view_compiled
 	};	
 	this.route = self.route;
-	this.constructList = [];
+	// this.constructList = [];
 	this.destructor = self.destructor || null; //additional function to call when closing module
 	if(!!this.route){
 		this.listen('init', this.bound('addRoute'));
