@@ -6,7 +6,6 @@ With ReadTool you can:
 	<li>add & browse texts</li>
 	<li>highlight & translate words while reading</li>
 </ul>
-add and browser texts. While reading you can highlight words, add translations for them
 
 
 <p><b>My tools:</b></p>
