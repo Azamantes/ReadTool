@@ -11,27 +11,26 @@
 	<meta charset='UTF-8'>
 	<link rel='stylesheet' href='css/keyframes.css' type='text/css'>
 	<link rel='stylesheet' href='css/sky.css' type='text/css'>
+	<link rel='stylesheet' href='css/classes.css' type='text/css'>
 	<link rel='stylesheet' href='css/tags.css' type='text/css'>
 	<link rel='stylesheet' href='css/ids.css' type='text/css'>
-	<link rel='stylesheet' href='css/classes.css' type='text/css'>
+	<!-- <link rel='stylesheet' href='build/css/styles.css' type='text/css'> -->
 	<link rel='stylesheet' href='css/forms.css' type='text/css'>
 	<link rel='stylesheet' href='css/main.css' type='text/css'>
-	
+
+	<script src='/Libraries/jscolor/jscolor.js'></script>
+	<script src='/Libraries/Mithril/mithril.min.js'></script>
 	<?php
 		if(isset($_SESSION['user'])){
-			echo "<script>const USER_ID = parseInt(" . $_SESSION['user'] . ");</script>";
+			echo "<script>const USER_ID = parseInt(" . $_SESSION['user'] . ");</script>\n";
 		}
 	?>
-
-	<!-- <script src='/Libraries/jscolor/jscolor.js'></script> -->
-	<script src='/Libraries/Mithril/mithril.min.js'></script>
-	<script src='js/extensions.js'></script>
+ 	<script src='build/js/scripts.js'></script>
+<!-- 	<script src='js/extensions.js'></script>
 	<script src='js/constructors.js'></script>
-	<script src='js/main.js'></script>
-	<script src='js/css.js'></script>
+	<script src='js/watchdogs.js'></script>
 	<script src='js/routes.js'></script>
 	<script src='js/websocket.js'></script>
-	<script src='js/watchdogs.js'></script>
 	<script src='js/keyboard.js'></script>
 	<script src='js/language.js'></script>
 	<script src='js/text.js'></script>
@@ -41,7 +40,7 @@
 	<script src='js/sky_logout.js'></script>
 	<script src='js/sky_text_browser.js'></script>
 	<script src='js/sky_text_add.js'></script>
-	<script src='js/sky_settings.js'></script>
+	<script src='js/sky_settings.js'></script> -->
 	<style>
 		g { color: green }
 		r { color: red }

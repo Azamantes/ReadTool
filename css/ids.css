@@ -17,10 +17,12 @@
 	right: 1%;
 	width: 23%;
 	height: 50px;
-	border-top-radius: 25px;
+	border-top-left-radius: 25px;
+	border-top-right-radius: 25px;
 }
 #topbar {
-	border-top-radius: 25px;
+	border-top-left-radius: 25px;
+	border-top-right-radius: 25px;
 }
 #topbar > div {
 	width: 50%;
@@ -47,7 +49,7 @@
 	padding: 15px;
 }
 #main {
-	user-select: none;
+	-moz-user-select: none;
 	overflow-y: scroll;
 	cursor: default;
 }

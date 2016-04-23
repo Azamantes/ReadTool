@@ -10,10 +10,10 @@ With ReadTool you can:
 
 <p><b>My tools:</b></p>
 - HTML
-- CSS
-- PHP (simple user authentication)
-- Javascript, native browser Websockets
-- Node.js
+- CSS (SCSS)
+- PHP (*very* simple user authentication)
+- Javascript (native Websockets)
+- Node.js (Grunt.js)
 - MySQL database
 
 <b>Library dependencies:</b><br>

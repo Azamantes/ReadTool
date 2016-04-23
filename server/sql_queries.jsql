@@ -1,5 +1,5 @@
 module.exports = {
-	connect: "SELECT id, login, language_from, language_to FROM users WHERE id = ? AND status = 1;",
+	connect: "SELECT id, login, language_from, language_to, color1, color2 FROM users WHERE id = ? AND status = 1;",
 	changeLanguageFrom: "UPDATE users SET language_from = (SELECT id FROM languages WHERE name = ?) WHERE id = ?;",
 	changeLanguageTo: "UPDATE users SET language_to = (SELECT id FROM languages WHERE name = ?) WHERE id = ?;",
 	submitText: {
@@ -7,6 +7,10 @@ module.exports = {
 		clean: "INSERT INTO texts_clean(id, content) VALUES (?, ?);"
 	},
 	changePassword: "UPDATE users SET password = ? WHERE id = ?;",
+	setColor1: "UPDATE users SET color1 = ? WHERE id = ?;",
+	setColor2: "UPDATE users SET color2 = ? WHERE id = ?;",
+	getColor1: "SELECT color1 FROM users WHERE id = ?;",
+	getColor2: "SELECT color2 FROM users WHERE id = ?;",
 	getTitles: "SELECT t.id, t.title, t.words, t.words_unique, t.length, u.login author, l.name language FROM texts t, languages l, users u WHERE t.author = u.id AND l.id = t.language AND l.id = ? AND t.language = u.language_from AND t.title LIKE '%:contains%' ORDER BY t.:what :how;",
 	pullText: "SELECT t.id, t.title, t.content, t.words, t.words_unique, t.source, t.language, tc.content content_clean FROM texts t, texts_clean tc WHERE t.id = tc.id AND t.id = ?;",
 	wordState: {

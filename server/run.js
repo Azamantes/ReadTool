@@ -2,7 +2,7 @@
 
 const Global = new Map;
 const Userlist = new Set;
-const SQL_QUERIES = require('./sql_queries.js');
+const SQL_QUERIES = require('./sql_queries.jsql');
 
 const WebSocketServer = require('ws').Server;
 const server = new WebSocketServer({
@@ -60,6 +60,7 @@ User.prototype.events = new Set([
 	'connect',
 	'disconnect',
 	'changePassword',
+	'setColor',
 	'changeLanguageFrom',
 	'changeLanguageTo',
 	'submitText',
@@ -96,6 +97,8 @@ User.prototype.connect = function(data){
 		this.login = row.login;
 		this.languageFrom = row.language_from;
 		this.languageTo = row.language_to;
+		this.color1 = row.color1;
+		this.color2 = row.color2;
 		Userlist.add(this);
 	}).on('end', () => {
 		if(!this.userID){
@@ -104,6 +107,8 @@ User.prototype.connect = function(data){
 		this.unicast({ event: 'connected.' });
 		this.unicast({ event: 'languages', data: Global.get('languages') });
 		this.unicast({ event: 'RegExp', data: this.REGEXP_STRING });
+		this.unicast({ event: 'Color Set', color: this.color1, number: 1 });
+		this.unicast({ event: 'Color Set', color: this.color2, number: 2 });
 		Global.get('languages').map(box => {
 			if(box.id === this.languageFrom){
 				this.unicast({ event: 'Language From', data: box.shorthand });
@@ -377,26 +382,45 @@ User.prototype.pullText = function(data){
 };
 
 /*
- * PASSWORD
+ * SETTINGS
 */
 User.prototype.changePassword = function(data){
 	var password = data.password;
 	if(!password){
-		this.unicast({ event: 'Password Incorrect' });
+		this.unicast({ event: 'Password not given' });
 		return console.log('User.prototype.changePassword :: no data given.');
 	}
 	var box = false;
-	database.query(SQL_QUERIES.changePassword, [data.password, this.userID])
+	database.query(SQL_QUERIES.changePassword, [password, this.userID])
 	.on('result', (row) => {
 		if(!!row.affectedRows) box = true;
-		console.log('row.affectedRows:', row.affectedRows);
+		// console.log('row.affectedRows:', row.affectedRows);
 	}).on('end', () => {
 		if(box) console.log(this.login, 'changed password.');
-		console.log('Box:', box);
+		// console.log('Box:', box);
 		this.unicast({ event: 'Password ' + (box? 'Changed' : 'Incorrect') });
 	});
 };
-
+User.prototype.setColor = function(data){
+	var color = data.color;
+	var number = data.number;
+	if(!color){
+		this.unicast({ event: 'Color' + number + ' not given' });
+		return console.log('User.prototype.setColor :: no color given.');
+	}
+	var box = false;
+	console.log('Bedzie set color' + number);
+	this.query(SQL_QUERIES['setColor' + number], [color, this.userID])
+	.on('result', (row) => {
+		if(!!row.affectedRows) box = true;
+		// console.log('row.affectedRows:', row.affectedRows);
+	}).on('end', () => {
+		if(box) console.log(this.login, 'color' + number + ' set.');
+		console.log('Powiodlo sie ustawienie koloru nr' + number, color);
+		this['color' + number] = color;
+		this.unicast({ event: 'Color ' + (box? 'Set' : 'Not Set'), number, color });
+	});
+};
 /*
  * SOME UTILS
 */

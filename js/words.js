@@ -1,5 +1,4 @@
-(function WORDS(){
-	'use strict';
-
-	var self = new MainModule();
-})();
+	(function WORDS(){
+		var self = new MainModule();
+	})();
+	

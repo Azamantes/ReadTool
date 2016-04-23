@@ -15,7 +15,6 @@
 	margin: 0px 0px;
 }
 .menuitem:hover {
-	background-color: 0x0000FE;
 	box-shadow: inset 0px 0px 10px #888888;
 }
 .menuitem:hover:first-child {
@@ -59,7 +58,6 @@
 	border-bottom-right-radius: 25px;
 }
 .dropdown p:hover {
-	background-color: 0x0000FE;
 	box-shadow: inset 0px 0px 10px #888888;
 }
 .dropdown :first-child {

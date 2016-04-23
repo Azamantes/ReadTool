@@ -1,0 +1,1 @@
+}(m, jscolor, window.console, USER_ID));
