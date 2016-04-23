@@ -109,7 +109,6 @@
 	}
 	class MainModule {
 		constructor (config = {}) {
-			// super();
 			this.container = {};
 			this.keys = new Set();
 			this.view_compiled = config.view ? config.view() : null;
@@ -167,20 +166,20 @@
 			return this[method].bind(this);
 		}
 	}
-	MainModule.prototype.place = null;
+	// MainModule.prototype.place = null; // will point to Watchdog.
 	MainModule.prototype.popup = {
 		place: null,
-		show: function(){
+		show() {
 			this.place.className = 'appear';
 		},
-		hide: function(){
+		hide() {
 			this.place.className = 'disappear';
 		},
-		render: function(view, text){
+		render(view, text) {
 			m.render(this.place, view);
 			if(text) document.get('sky-confirm').innerHTML = text;
 			this.show();
-		}
+		},
 	};
 
 	class SkyModule extends MainModule {
@@ -220,7 +219,7 @@
 			}, 250);
 		}
 	}
-	SkyModule.prototype.place = null;
+	// SkyModule.prototype.place = null;
 	
 	// ----------------------------
 	// Native Function extensions
@@ -315,12 +314,16 @@
 		
 		function checkMouse(event){
 			let logic = self.get('forbidden: clicks').has(event.target.tagName);
+			
 			self.set('keyboardFree', !logic);
 		}
 		function checkKeyboard(event){
 			if(!self.get('keyboardFree')) return;
-			let logic = self.get('forbidden: keys').has(event.keyCode) && self.get('forbidden: clicks').has(event.target.tagName);
-			self.set('keyboardFree', !logic);
+
+			const keys = self.get('forbidden: keys').has(event.keyCode);
+			const clicks = self.get('forbidden: clicks').has(event.target.tagName);
+
+			self.set('keyboardFree', !(keys && clicks));
 		}
 	})();
 	
@@ -365,6 +368,7 @@
 		}
 		function getLanguages(data = { data: [] }, array = data.data){
 			const box = array.map(lang => m('p', lang.name));
+			
 			m.render(document.get('language_from'), box);
 			m.render(document.get('language_to'), box);
 			self.register('languages', () => array);
@@ -447,6 +451,7 @@
 			window.location.href = 'logout.php';
 		}
 		function back(event){
+			m.redraw.strategy('none');
 			event.preventDefault();
 			self.close();
 		}
@@ -547,6 +552,7 @@
 			const input2 = self.get('color2: input');
 			const cache1 = self.get('color1: cache');
 			const cache2 = self.get('color2: cache');
+			
 			input1.value = cache1;
 			input2.value = cache2;
 			input1.style.background = '#' + cache1;
@@ -557,8 +563,9 @@
 			const number = parseInt(data.number);
 			const name = 'color' + number;
 			const css = number === 1? 'y' : 'y:hover';
+
 			self.set(name + ': cache', data.color);
-			document.get(`main-transation-${css}`).textContent = `${css}{background:#${color};}`;
+			document.get(`main-translation-${css}`).textContent = `${css}{background:#${color};}`;
 		}
 		function setColor1(){
 			websocket.sendJSON({ event: 'setColor', color: self.get('color1: input').value, number: 1 });
@@ -653,9 +660,12 @@
 			));
 		}
 		function beforeSubmitText(){
+			m.redraw.strategy('none');
 			saveState();
+
 			const select = document.get('text_add_language_select');
 			const language = select.options[parseInt(select.value) - 1].text;
+			
 			self.popup.render(self.get('confirmation'), 'Are you sure the selected language <b>[' + language + ']</b> is correct?');
 		}
 		function submitText(event){
@@ -730,6 +740,7 @@
 			];
 		}
 		function getTexts(event){
+			m.redraw.strategy('none');
 			event.preventDefault();
 
 			let what = document.get('browser_sort_what');
@@ -740,28 +751,31 @@
 			
 			websocket.sendJSON({
 				event: 'getTitles',
-				what: what,
-				how: how,
-				contains: document.get('browser_contains').value
+				contains: document.get('browser_contains').value,
+				what,
+				how,
 			});
 		}
 		function selectTitle(event){
-			var id;
-			if((/title#[0-9]+/).test(event.target.id)) id = event.target.id;
-			else if((/title#[0-9]+/).test(event.target.parentNode.id)) id = event.target.parentNode.id;
-			if(id === undefined){
+			const target = event.target;
+			const self = (/title#[0-9]+/).test(target.id);
+			const parent = (/title#[0-9]+/).test(target.parentNode.id);
+			let id;
+
+			if(self) id = parseInt(target.id.replace('title#', ''));
+			else if(parent) id = parseInt(target.parentNode.id.replace('title#', ''));
+			else return;
+			if(! (id > 0)){
 				return;
 			}
-			id = parseInt(id.replace('title#', ''));
-			if(isNaN(id) || id <= 0){
-				return; // really?
-			}
+
 			websocket.sendJSON({ event: 'pullText', id: id });
 		}
 		function putContent(data){
 			const fragment = document.createDocumentFragment();
 			const span = document.createElement('span');
 			let div;
+
 			data.data.map(text => {
 				div = document.createElement('DIV');
 				div.id = 'title#' + text.id;
@@ -796,23 +810,14 @@
 	(function TEXT(){
 		// I'll leave normal variables here.
 
-		var Words = new Map();
-		var Text = new Map(); // overwriting native Text function
-		var allowedTags = new Set(['x', 'y']);
-		var CleanIndexesDOM;
-		var CleanDOMReferences; // Map :: maps
-		var Cache; // []
-		var REGEXP;
-		var FloatingTranslation = null;
-		var currentTranslation = []; // current translation for FloatingTranslation
-		var lastWord;
+		const Words = new Map();
+		const Text = new Map(); // overwriting native Text function
+		const allowedTags = new Set(['x', 'y']);
+		const CleanIndexesDOM = new Map();
+		const CleanDOMReferences = new Map(); // Map :: maps
+		const Position = { x: null, y: null };
 
-		var Position = {
-			x: undefined,
-			y: undefined
-		};
-
-		var self = new MainModule();
+		const self = new MainModule();
 		self.listen('init', init);
 		self.listen('keydown: 49', hideTranslation);
 		self.listen('keydown: 50', hideTranslation);
@@ -825,42 +830,80 @@
 		self.listen('mouseclick::', click);
 		self.listen('mousedown: main', mousedown);
 		self.listen('mouseover: main', mouseover);
-		
+		self.set('cache', []);
+		// self.set('REGEXP', null);
+		self.set('translation: popup', null);
+		self.set('translation: list', []); // list of translations for currently hovered word
+		self.set('lastWord', ''); // last hovered word (so that we don't send superfluous websocket to the server.) #overoptimization
+
 		function init(){
-			FloatingTranslation = document.get('main-translation');
+			self.set('translation: popup', document.get('main-translation'));
+			let box = {
+				'#main-translation': {
+					right: '-300px',
+					bottom: '-300px'
+				}
+			};
+			self.set('translation: hidden', JSON.stringify(box)
+				.replace(/(^\{+|\"|\}+$)/g, '')
+				.replace(/,/g, ';')
+				.replace(/:{/, '{') +
+				'}'
+			);
+			box = {
+				'#main-translation': {
+					'animation': 'main-translation 1s',
+					'animation-fill-mode': 'forwards',
+					'bottom': 'bottomValuepx',
+					'right': 'rightValuepx',
+				}
+			};
+			self.set('translation: visible', JSON.stringify(box)
+				.replace(/(^\{+|\"|\}+$)/g, '')
+				.replace(/,/g, ';')
+				.replace(/:{/, '{') +
+				'}'
+			);
 		}
 		function setRegExp(data){
-			REGEXP = new RegExp(data.data, 'g');
+			self.set('REGEXP', new RegExp(data.data, 'g'));
 		}
 		function restoreState(){
 			render();
 			bindDOMReferences();
 		}
 		function parseText(data){
-			var LANGUAGE_WORDS = Words.get(data.language),
-				array = data.content.replace(/\n/g, ' <br> ').replace(/ +/g, ' ').split(' '),
-				length = array.length,
-				i = -1,
-				word, tag, box;
+			const LANGUAGE_WORDS = Words.get(data.language);
+			const REGEXP = self.get('REGEXP');
+			const Cache = self.get('cache');
+			const array = data.content
+				.replace(/\n/g, ' <br> ')
+				.replace(/ +/g, ' ')
+				.split(' ');
+			const length = array.length;
 
 			Text.set('language', data.language);
 			Text.set('title', data.title);
 			Text.set('source', data.source);
 
-			Cache = [];
-			CleanIndexesDOM = new Map();
+			Cache.length = 0;
+			CleanIndexesDOM.clear();
+
+			let i = -1;
+			let word, tag, box, indexes;
 
 			while(++i < length){
 				word = array[i];
 				box = word.toLowerCase().replace(REGEXP, '');
 				if(!CleanIndexesDOM.has(box)){
 					CleanIndexesDOM.set(box, []);
+					indexes = CleanIndexesDOM.get(box);
 				}
 				if(word === '<br>'){
 					Cache.push(word);
 					continue;
 				}
-				CleanIndexesDOM.get(box).push(i);
+				indexes.push(i);
 				tag = LANGUAGE_WORDS.has(box)? 'y' : 'x';
 				Cache.push('<' + tag + '>' + word + '</' + tag + '>');
 			}
@@ -874,12 +917,13 @@
 			Text.set('words: all', Cache);
 		}
 		function bindDOMReferences(){
-			CleanDOMReferences = new Map();
-			var content = document.get('text_reading_content').children,
-				box = {},
-				iterator = CleanIndexesDOM.keys(),
-				array;
+			CleanDOMReferences.clear();
+			const content = document.get('text_reading_content').children;
+			const iterator = CleanIndexesDOM.keys();
 			const arrow = (index) => content[index];
+			let box = {};
+			let array;
+
 			while(true){
 				box = iterator.next();
 				if(box.done) break;
@@ -888,14 +932,13 @@
 			}
 		}
 		function replaceNodes(target, cleanWord, logic){
-			var content = target.parentNode,
-				dom = document.createElement(logic? 'y' : 'x'),
-				array = CleanDOMReferences.get(cleanWord), // array of references to Nodes with the given textContent
-				length = array.length;
+			const content = target.parentNode;
+			const dom = document.createElement(logic? 'y' : 'x');
+			const array = CleanDOMReferences.get(cleanWord); // array of references to Nodes with the given textContent
+			const length = array.length;
 			
-			let i = -1,
-				box,
-				element;
+			let i = -1;
+			let box, element;
 			
 			while(++i < length){
 				element = array[i];
@@ -906,17 +949,27 @@
 			}
 		}
 		function render(){
-			var max = Cache.length, i = -1, string = '';
-			while(++i < max) string += Cache[i] + ' ';
-			var title = '<div id="text_reading_title"><h1>' + Text.get('title') + '</h1></div>',
-				content = '<div id="text_reading_content">' + string + '</div>',
-				source = '<div id="text_reading_source">Source: <a>' + Text.get('source') + '</a></div>';
+			const Cache = self.get('cache');
+			const max = Cache.length;
+			let i = -1;
+			let string = '';
+			
+			while(++i < max){
+				string += Cache[i] + ' ';
+			}
+
+			const title = `<div id='text_reading_title'><h1>${Text.get('title')}</h1></div>`;
+			const content = `<div id='text_reading_content'>${string}</div>`;
+			const source = `<div id='text_reading_source'>Source: <a>${Text.get('source')}</a></div>`;
+			
 			self.place.innerHTML = title + content + source;
 		}
 		function click(event){
 			let time = Date.now();
 			const target = event.target;
 			const tag = target.tagName.toLowerCase();
+			const REGEXP = self.get('REGEXP');
+
 			
 			if(!allowedTags.has(tag)) return;
 
@@ -924,9 +977,10 @@
 				.toLowerCase()
 				.replace(REGEXP, '');
 			
-			if(text === '') return;
+			if(!text) return;
 
 			const logic = tag === 'x';
+			
 			replaceNodes(target, text, logic);
 
 			setTimeout(function(){
@@ -944,19 +998,26 @@
 			event.preventDefault();
 		}
 		function mouseover(event){
-			var tag = event.target.tagName;
+			const REGEXP = self.get('REGEXP');
+			const translation = self.get('translation: popup');
+			const tag = event.target.tagName;
+
 			Position.x = event.clientX;
 			Position.y = event.clientY;
+
 			if(tag !== 'Y'){
 				hideTranslation();
-				FloatingTranslation.innerHTML = '';
+				translation.innerHTML = '';
 				self.deity.shout('translation: Chill Out');
 				return;
 			}
-			var clean = event.target.textContent.toLowerCase().replace(REGEXP, '');
+
+			const clean = event.target.textContent.toLowerCase().replace(REGEXP, '');
+			
 			self.deity.shout('translation: from', clean); // for translation
-			if(clean === lastWord){
-				lastWord = clean;
+			
+			if(clean === self.get('lastWord')){
+				self.set('lastWord', clean);
 				showTranslation(event);
 			} else {
 				websocket.sendJSON({
@@ -965,53 +1026,29 @@
 				});
 			}
 		}
-		
-		const hiddenTranslationObject = {
-			'#main-translation': {
-				right: '-300px',
-				bottom: '-300px',
-			}
-		};
-		const hiddenTranslation = JSON.stringify(hiddenTranslationObject)
-			.replace(/(^\{+|\"|\}+$)/g, '')
-			.replace(/,/g, ';')
-			.replace(/:{/, '{') + '}';
-
 		function hideTranslation(){
-			document.get('main-css').textContent = hiddenTranslation;
+			document.get('main-css').textContent = self.get('translation: hidden');
 		}
 		function addTranslation(data){
-			if(currentTranslation.length < 5){
-				currentTranslation.push(data.translation);
+			const list = self.get('translation: list');
+			if(list.length < 5){
+				list.push(data.translation);
 			}
 			putTranslation();
 		}
 		function gotTranslation(data){
-			currentTranslation = data.translation;
+			self.set('translation: list', data.translation);
 			putTranslation();
 			showTranslation();
 		}
 		function putTranslation(){
-			FloatingTranslation.innerHTML = currentTranslation.length? '<p>' + currentTranslation.join('</p><p>') + '</p>' : '<p>...</p>';
+			const list = self.get('translation: list');
+			self.get('translation: popup').innerHTML = list.length? '<p>' + list.join('</p><p>') + '</p>' : '<p>...</p>';
 		}
-		
-		const visibleTranslationObject = {
-			'#main-translation': {
-				'animation': 'main-translation 1s',
-				'animation-fill-mode': 'forwards',
-				'bottom': 'bottomValuepx',
-				'right': 'rightValuepx',
-			}
-		};
-		const visibleTranslation = JSON.stringify(visibleTranslationObject)
-			.replace(/(^\{+|\"|\}+$)/g, '')
-			.replace(/,/g, ';')
-			.replace(/:{/, '{') + '}';
 		function showTranslation(){
-			let string = visibleTranslation
+			document.get('main-css').textContent = self.get('translation: visible')
 				.replace(/bottomValue/, screen.height - screen.availTop - Position.y - 40)
-				.replace(/rightValue/, screen.width - screen.availLeft - Position.x - 40);			
-			document.get('main-css').textContent = string;
+				.replace(/rightValue/, screen.width - screen.availLeft - Position.x - 40);
 		}
 		function gotMyWords(data){
 			Words.set(data.language, new Set(data.words));
@@ -1019,7 +1056,7 @@
 	})();
 	
 	(function TRANSLATION(){
-		var self = new MainModule();
+		const self = new MainModule();
 		self.listen('init', init);
 		self.listen('translation: from', catchThat);
 		self.listen('translation: Chill Out', () => self.set('chilling', true));
@@ -1037,6 +1074,17 @@
 			self.set('place: found', document.get('translation_found'));
 			self.watch('translation_add_to', 'keydown', readySteady); // send translation via websocket
 			self.watch('translation_find', 'keydown', findTranslation);
+
+			let elements = [
+				document.createElement('style'),
+				document.createElement('style'),
+				document.createElement('style')
+			];
+
+			elements[0].id = 'main-css';
+			elements[1].id = 'main-translation-y';
+			elements[2].id = 'main-translation-y:hover';
+			elements.map(el => document.head.appendChild(el));
 		}
 		function catchThat(string){
 			self.get('place: from').value = string;
@@ -1051,6 +1099,7 @@
 			if(keyNotEnter || differentValue){
 				return; // nothind to do.
 			}
+
 			self.set('lastTry', target.value);
 			websocket.sendJSON({
 				event: 'getTranslation',
@@ -1059,17 +1108,15 @@
 			});
 		}
 		function readySteady(event){
-			const target = event.target;
-			
-			if(event.keyCode !== 13){
+			const wordFrom = self.get('place: from').value;
+			const wordTo = event.target.value;
+			const logic = !wordFrom || !wordTo;
+
+			if(logic || event.keyCode !== 13){
 				return; //not enter or not focused
 			}
-			let from = self.get('place: from').value,
-				to = target.value;
-			if(!from || !to){
-				return;
-			}
-			websocket.sendJSON({ event: 'addTranslation', from, to });
+
+			websocket.sendJSON({ event: 'addTranslation', from: wordFrom, to: wordTo });
 		}
 		function clearAddTranslation(){
 			if(self.get('chilling')){
@@ -1078,9 +1125,10 @@
 			self.get('place: to').value = '';
 		}
 		function found(data){
-			var list = document.createElement('UL');
-			var listElement = document.createElement('li');
-			var box;
+			const list = document.createElement('UL');
+			const listElement = document.createElement('li');
+			let box;
+
 			data.translation.map(item => {
 				box = listElement.cloneNode(true);
 				box.textContent = item;
@@ -1100,7 +1148,6 @@
 			SkyModule.prototype.place = document.get('sky-container');
 			MainModule.prototype.popup.place = document.get('sky-confirm-container');
 			SkyModule.prototype.popup.place = document.get('sky-confirm-container');
-			
 
 			websocket.onopen = function(){
 				console.log('Websocket connection is open.');
@@ -1112,22 +1159,10 @@
 			websocket.onmessage = function(data){
 				data = JSON.parse(data.data);
 				if(data.event === 'bye'){
-					websocket.close();
-					return;
+					return websocket.close();
 				}
 				Watchdog.shout('websocket: ' + data.event, data);
 			};
-
-			let element = document.createElement('style');
-			element.id = 'main-css';
-			document.head.appendChild(element);
-			element = document.createElement('style');
-			element.id = 'main-transation-y';
-			document.head.appendChild(element);
-			element = document.createElement('style');
-			element.id = 'main-transation-y:hover';
-			document.head.appendChild(element);
-			
 
 			Watchdog.init();
 			Watchdog.shout('init routes');
@@ -1141,12 +1176,12 @@
 						Watchdog.closeModule(); 
 						break;
 					} //ESC
-					default:
+					default: {
 						Watchdog.shout('keydown: ' + event.keyCode);
 						// Watchdog.shout('keydown: ' + String.fromCharCode(event.keyCode));
+					}
 				}
 			});
-			
 			Watchdog.watch(window, 'keyup', function(event){
 				Watchdog.shout('keyboard: keyup', event);
 			});
@@ -1156,22 +1191,15 @@
 			Watchdog.watch('main', 'mouseover', function(event){
 				Watchdog.shout('mouseover: main', event); // more vague, not especially the "main", but it's ok
 			});
-			// Watchdog.add({ element: 'main', event: 'mousedown', callback: null });
-			// Watchdog.add({ element: 'main', event: 'mousemove', callback: null });
 			Watchdog.watch('main', 'mousedown', function(event){
 				event.preventDefault();
-				// Watchdog.shout('menu: ' + event.target.getAttribute('event'));
 			});
 			Watchdog.watch('menu', 'click', function(event){
 				Watchdog.shout('menu: ' + event.target.getAttribute('event'));
 			});
-			// ------------
-			// Top bar
-			// ------------
 			Watchdog.watch('topbar', 'click', function(event){
 				Watchdog.shout('mouseclick: ' + (event.target.getAttribute('event') || event.target.parentNode.getAttribute('event')), event);
 			});
-			Watchdog.startWatching();
 		});
 	})();
 	

@@ -25,7 +25,7 @@
 	?>
 
 	<script src='/Libraries/jscolor/jscolor.js'></script>
-	<script src='/Libraries/Mithril/mithril.min.js'></script>
+	<script src='/Libraries/Mithril.js/mithril.min.js'></script>
  	<script src='../js/script.js'></script>
 	<style>
 		g { color: green }
