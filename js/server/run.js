@@ -2,7 +2,7 @@
 
 const Global = new Map;
 const Userlist = new Set;
-const SQL_QUERIES = require('./sql_queries.jsql');
+const SQL_QUERIES = require('./sql_queries.js');
 
 const WebSocketServer = require('ws').Server;
 const server = new WebSocketServer({
@@ -102,7 +102,9 @@ User.prototype.connect = function(data){
 		Userlist.add(this);
 	}).on('end', () => {
 		if(!this.userID){
-			return this.socket.disconnect();
+			console.log(this.socket.close);
+			console.log(this.socket.disconnect);
+			return this.socket.close();
 		}
 		this.unicast({ event: 'connected.' });
 		this.unicast({ event: 'languages', data: Global.get('languages') });

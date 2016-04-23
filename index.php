@@ -1,149 +1,90 @@
 <?php
 	session_start();
-
-	if(!isset($_SESSION['user'])){
-		header('Location: login.php');
+	if(isset($_SESSION['user'])){
+		header('Location: html/main.php');
 	}
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 	<meta charset='UTF-8'>
-	<link rel='stylesheet' href='css/keyframes.css' type='text/css'>
-	<link rel='stylesheet' href='css/sky.css' type='text/css'>
-	<link rel='stylesheet' href='css/classes.css' type='text/css'>
-	<link rel='stylesheet' href='css/tags.css' type='text/css'>
-	<link rel='stylesheet' href='css/ids.css' type='text/css'>
-	<!-- <link rel='stylesheet' href='build/css/styles.css' type='text/css'> -->
-	<link rel='stylesheet' href='css/forms.css' type='text/css'>
-	<link rel='stylesheet' href='css/main.css' type='text/css'>
-
-	<script src='/Libraries/jscolor/jscolor.js'></script>
-	<script src='/Libraries/Mithril/mithril.min.js'></script>
-	<?php
-		if(isset($_SESSION['user'])){
-			echo "<script>const USER_ID = parseInt(" . $_SESSION['user'] . ");</script>\n";
-		}
-	?>
- 	<script src='build/js/scripts.js'></script>
-<!-- 	<script src='js/extensions.js'></script>
-	<script src='js/constructors.js'></script>
-	<script src='js/watchdogs.js'></script>
-	<script src='js/routes.js'></script>
-	<script src='js/websocket.js'></script>
-	<script src='js/keyboard.js'></script>
-	<script src='js/language.js'></script>
-	<script src='js/text.js'></script>
-	<script src='js/words.js'></script>
-	<script src='js/translation.js'></script>
-	<script src='js/sky_help.js'></script>
-	<script src='js/sky_logout.js'></script>
-	<script src='js/sky_text_browser.js'></script>
-	<script src='js/sky_text_add.js'></script>
-	<script src='js/sky_settings.js'></script> -->
+	<link type='text/css' rel='stylesheet' href='css/login.css'>
+	<link type='text/css' rel='stylesheet' href='css/forms.css'>
+	<link type='text/css' rel='stylesheet' href='css/keyframes.css'>
 	<style>
-		g { color: green }
-		r { color: red }
+		g {
+			color: green;
+		}
+		r {
+			color: red;
+		}
 	</style>
+<?php
+	include 'html/config.php';
+	$data = '';
+	if(isset($_POST['login']) && isset($_POST['password'])){
+
+		$login = clear($_POST['login']);
+		$password = clear($_POST['password']);
+		
+		if($login !== '' && $password !== ''){
+			if(isset($_POST['button:register'])){
+				$result = $mysqli -> query("SELECT id FROM users WHERE login = '{$login}';");
+				if($result -> num_rows === 0){
+					$mysqli -> query("INSERT INTO users(login, password) VALUES ('{$login}', '{$password}');");
+					if($mysqli -> affected_rows === 1){
+						$data = "<g>User successfully registered.</g>"; 	
+					} else {
+						$data = "<r>User already exists. (impossible)</r>";
+					}
+				} else {
+					$data = "<r>User already exists.</r>";
+				}
+			} else if(isset($_POST['button:login'])){
+				$result = $mysqli->query("SELECT id, status FROM users WHERE login = '{$login}' AND password = '{$password}' AND status = 0;");
+				if(!$result){
+			        $data = "Incorrect login or password.";
+				} else {
+					$row = $result -> fetch_assoc();
+					if($row['logged'] === '1'){
+						$data = "This user is already logged in.";
+					} else {
+						$_SESSION['user'] = $row['id'];
+						$_SESSION['userGroup'] = $row['userGroup'];
+						if($_SESSION['user'] !== ''){
+							$mysqli -> query("UPDATE users SET status = 1 WHERE id = '{$_SESSION['user']}';");
+							header("Location: html/main.php");
+						}	
+					}
+				}
+			}
+		}
+	}
+	$mysqli -> close();
+?>
+
 </head>
 <body>
-	<div id='topbar-container' class='field'>
-		<div id='topbar' class='relative'>
-			<div class='topbar-language'>
-				<span></span>
-				<div id='language_to' class='dropdown' event='Language To'></div>
-			</div>
-			<div class='topbar-language'>
-				<span></span>
-				<div id='language_from' class='dropdown' event='Language From'></div>
-			</div>
-		</div>
-	</div>
-	<div id='main-translation'>asd</div>
-	<div id='main-container' class='field'>
-		
-		<div id='main' class='relative'>
 
-<!-- 		<div class="cssload-container">
-			<div class="cssload-speeding-wheel"></div>
-		</div> -->
-			<!-- <div>
-				<h1>Wyglad:</h1>
-				<ul>
-					<li>Przegladanie tekstow:
-						<ul>
-							<li>wszystkich</li>
-							<li>przeczytanych</li>
-							<li>w danym jezyku</li>
-							<li>nie dluzszy niz X znakow</li>
-							<li>z podanej kategorii</li> // hashtagi?
-						</ul>
-					</li>
-				</ul>
-				<p>Zawezanie poszukiwan</p>
-				<ul>
-					<li>Przegladanie zdan:
-						<ul>
-							<li>zawierajacych podane wyrazy/frazy</li>
-							<li>w danym jezyku</li>
-						</ul>
-					</li>
-					<li>Przegladanie fraz:
-						<ul>
-							<li>zawierajacych podane wyrazy</li>
-							<li>w podanym jezyku</li>
-						</ul>
-					</li>
-					<li>Przegladanie wyrazow:
-						<ul>
-							<li>zawierajacych podany ciag znakow</li>
-							<li>w podanym jezyku</li>
-						</ul>
-					</li>
-				</ul>
-				<p>Find translation</p>
-				<p>radiobox: word/phrase/sentence</p>
-				<p>Find word: - simple</p>
-				<p>Find phrase: - simple</p>
-				<p>Find sentence: - simple</p>
-			</div> -->
+<form class='form appear' method='POST' action='index.php'>
+	<div class='form-head'>
+		<h2>Login</h2>
+		<b><?php echo $data ?></b>
+	</div>
+	<div class='form-body'>
+		<div class='form-body-left'>
+			<span>Login:</span>
+			<span>Password:</span>
 		</div>
-	</div>	
-	<div id='menu-container' class='field'>
-		<!-- <h2>MENU</h2> -->
-		<div id='menu' class='menu'>
-			<p class='menuitem' event='Read Text'>Read text</p>
-			<p class='menuitem' event='Words'>Words</p>
-			<p class='menuitem' event='Phrases'>Phrases</p>
-			<p class='menuitem' event='Sentences'>Sentences</p>
-			<hr>
-			<p class='menuitem' event='Settings'>Settings</p>
-			<p class='menuitem' event='Help'>Help</p>
-			<p class='menuitem' event='Logout'>Logout</p>
+		<div class='form-body-right'>
+			<input autocomplete='off' name='login'>
+			<input autocomplete='off' name='password' type='password'>
 		</div>
 	</div>
-	<div id='right-1-container' class='field'>
-		<div id='translation-container' class='.relative'>
-			<div>
-				<h3>Add translation</h3>
-				<div><input id='translation_add_from' placeholder='From' autocomplete='off'></div>
-				<div><input id='translation_add_to' placeholder='To' autocomplete='off'></div>
-			</div>
-			<div>
-				<h3>Find translation</h3>
-				<input id='translation_find' placeholder='What are you looking for?' autocomplete='off'>
-				<div id='translation_found'>
-					<x></x>
-				</div>
-			</div>
-		</div>
+	<div class='form-bottom'>
+		<input name='button:login' value='Let me in' type='submit'>
+		<input name='button:register' value='Register (use given credentials)' type='submit'>
 	</div>
-	<div id='sky-container'  class='hidden'>
-		<div id='fog'></div>
-		<div id='sky' class='.relative'></div>
-		<div id='sky-confirm-container' class='hidden'></div>
-	</div>
+</form>
 </body>
-
 </html>
-

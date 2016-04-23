@@ -7,5 +7,5 @@
 		unset($_SESSION['userGroup']);
 		$mysqli -> close();
 	}
-	header('Location: login.php');
+	header('Location: ../index.php');
 ?>
