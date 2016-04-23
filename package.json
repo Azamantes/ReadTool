@@ -1,0 +1,26 @@
+{
+  "name": "readtool",
+  "version": "0.1.0",
+  "description": "<p><b>Description:</b></p>\r With ReadTool you can:\r <ul>\r \t<li>add & browse texts</li>\r \t<li>highlight & translate words while reading</li>\r </ul>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Azamantes/ReadTool.git"
+  },
+  "author": "Mateusz Walas",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Azamantes/ReadTool/issues"
+  },
+  "homepage": "https://github.com/Azamantes/ReadTool#readme",
+  "devDependencies": {
+    "grunt-contrib-compass": "^1.1.1",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-sass": "^1.0.0",
+    "grunt-contrib-uglify": "^1.0.1",
+    "grunt-contrib-watch": "^1.0.0"
+  },
+  "dependencies": {
+    "grunt": "^1.0.1"
+  }
+}
