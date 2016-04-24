@@ -10,10 +10,10 @@ With ReadTool you can:
 
 <p><b>My tools:</b></p>
 - HTML
-- CSS | SCSS
+- CSS
 - PHP | *very* basic (login, session)
-- Javascript | ES6 | Websockets
-- Node.js | Grunt.js
+- Javascript
+- Node.js
 - MySQL database
 
 <b>Library dependencies:</b><br>
