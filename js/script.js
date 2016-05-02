@@ -810,6 +810,14 @@
 	(function TEXT(){
 		// I'll leave normal variables here.
 
+		// nasluchuje (eventy) -> funkcje eventow
+		// ustawia sobie jakies zmienne
+		// obserwuje main
+		// ma jakistam swoj view
+		// cache'uje pewne rzeczy
+		// ma funkcje init
+		// ma place
+
 		const Words = new Map();
 		const Text = new Map(); // overwriting native Text function
 		const allowedTags = new Set(['x', 'y']);
@@ -890,20 +898,21 @@
 			CleanIndexesDOM.clear();
 
 			let i = -1;
-			let word, tag, box, indexes;
+			let word, tag, box;
 
 			while(++i < length){
 				word = array[i];
 				box = word.toLowerCase().replace(REGEXP, '');
-				if(!CleanIndexesDOM.has(box)){
-					CleanIndexesDOM.set(box, []);
-					indexes = CleanIndexesDOM.get(box);
-				}
+
 				if(word === '<br>'){
 					Cache.push(word);
 					continue;
 				}
-				indexes.push(i);
+
+				if(!CleanIndexesDOM.has(box)){
+					CleanIndexesDOM.set(box, [i]);
+				} else CleanIndexesDOM.get(box).push(i);
+				
 				tag = LANGUAGE_WORDS.has(box)? 'y' : 'x';
 				Cache.push('<' + tag + '>' + word + '</' + tag + '>');
 			}
@@ -936,13 +945,12 @@
 			const dom = document.createElement(logic? 'y' : 'x');
 			const array = CleanDOMReferences.get(cleanWord); // array of references to Nodes with the given textContent
 			const length = array.length;
-			
 			let i = -1;
 			let box, element;
 			
 			while(++i < length){
 				element = array[i];
-				box = dom.cloneNode();
+				box = dom.cloneNode(false);
 				box.textContent = element.textContent;
 				array[i] = box;
 				content.replaceChild(box, element);
@@ -1056,6 +1064,14 @@
 	})();
 	
 	(function TRANSLATION(){
+
+		// nasluchuje (eventy) -> funkcje eventow
+		// ustawia sobie jakies swoje wartosci
+		// ma funkcje init
+		// ma place, gdzie wstawiac swoj view
+		// no i ma view
+		// obserwuje elementy DOM'u -> funkcje DOM
+
 		const self = new MainModule();
 		self.listen('init', init);
 		self.listen('translation: from', catchThat);
@@ -1073,6 +1089,9 @@
 			self.set('place: to', document.get('translation_add_to'));
 			self.set('place: found', document.get('translation_found'));
 			self.watch('translation_add_to', 'keydown', readySteady); // send translation via websocket
+			self.watch('translation_add_to', 'focus', function () {
+				console.log('a');
+			});
 			self.watch('translation_find', 'keydown', findTranslation);
 
 			let elements = [

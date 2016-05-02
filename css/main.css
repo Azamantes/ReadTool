@@ -9,12 +9,9 @@
 
 	padding: 15px;
 	background: white;
-	border-radius: 25px;
+	border-radius: 1px;
 	box-shadow: 0px 0px 10px black;
 }
-#main-translation p {
+#main-translation > p {
 	margin: 5px 0px;
 }
-/*
-that moment when it's 3:55 and you're wondering why the fuck are you reading about nuclear fusion on wikipedia.
-*/
