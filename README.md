@@ -16,9 +16,7 @@ With ReadTool you can:
 - Node.js
 - MySQL database
 
-<b>Library dependencies:</b><br>
-JScolor - http://jscolor.com/<br>
-Mithril.js - http://mithril.js.org/
+There are <b>no</b> more <b>library dependencies.</b><br>
 
 <p>----------------------------------------------</p>
 
