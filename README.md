@@ -16,7 +16,8 @@ With ReadTool you can:
 - Node.js
 - MySQL database
 
-There are <b>no</b> more <b>library dependencies.</b><br>
+<b>Dependencies:</b><br>
+- <a href='https://github.com/Azamantes/Plant.js' target='_blank'>Plant.js</a>
 
 <p>----------------------------------------------</p>
 
